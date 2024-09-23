@@ -31,23 +31,10 @@
 
     <title>Zust - Social Community & Marketplace HTML Template</title>
 
-    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    <link rel="icon" type="image/png" href="/images/favicon.png">
 </head>
 
 <body>
-
-    <!-- Start Preloader Area -->
-    @* <div class="preloader-area">
-    <div class="spinner">
-    <div class="inner">
-    <div class="disc"></div>
-    <div class="disc"></div>
-    <div class="disc"></div>
-    </div>
-    </div>
-    </div> *@
-    <!-- End Preloader Area -->
-    <!-- Start Preloader Area -->
     <div class="profile-authentication-area">
         <div class="container">
             <div class="row">
@@ -55,16 +42,16 @@
                     <div class="profile-authentication-image">
                         <div class="content-image">
                             <div class="logo">
-                                <a href="index.html"><img src="assets/images/logo.png" alt="Zust"></a>
+                                <a href="/Home/Index"><img src="/images/logo.png" alt="Zust"></a>
                             </div>
                             <div class="vector-image">
-                                <img src="assets/images/vector.png" alt="image">
+                                <img src="/images/vector.png" alt="image">
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-6 col-md-12">
+                <div class="col-lg-6 col-md-12" style="margin-top:100px!important">
                     <div class="login-form">
                         <h2>Login</h2>
 
@@ -91,36 +78,20 @@
                                 </div>
                             </div>
 
-                            <div style="margin-top:10px" class="form-group">
-                                <div class="col-sm-12 controls">
-                                    <input type="submit" class="btn-success" />
-                                </div>
+                            <div class="form-group">
+                                <input type="submit" class="default-btn" value="Login" />
                             </div>
 
                             <div class="form-group">
                                 <div class="col-md-12 control">
-                                    <div style="border-top:1px solid #888;padding-top:15px;font-size:85%">
+                                    <div style="border-top:1px solid #888;padding-top:15px;font-size:1.5em">
                                         Don't have an account!
-                                        <a asp-controller="Account" asp-action="Register">
-                                            Sign Up Here
+                                        <a asp-controller="Account" asp-action="Register" style="color:blue;">
+                                            Register Here
                                         </a>
                                     </div>
                                 </div>
                             </div>
-@* 
-                            <div class="remember-me-wrap d-flex justify-content-between align-items-center">
-                                <div class="checkbox">
-
-                                    <input asp-for="RememberMe" value="RememberMe" />
-
-
-                                </div>
-                            </div>
-
-                            <div style="margin-top:10px;" class="form-group">
-
-                                <input type="submit" class="default-btn" value="Login" />
-                            </div> *@
                         </form>
                     </div>
                 </div>
@@ -128,14 +99,14 @@
         </div>
 
         <div class="home-btn-icon">
-            <a href="index.html"><i class="flaticon-home"></i></a>
+            <a href="/Home/Index"><i class="flaticon-home"></i></a>
         </div>
+
     </div>
-    <!-- End Preloader Area -->
-    <!-- Links of JS files -->
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @* @await RenderSectionAsync("Scripts", required: false) *@
+
 </body>
 </html>

@@ -767,18 +767,18 @@
             <div class="sidemenu-body">
                 <ul class="sidemenu-nav metisMenu h-100" id="sidemenu-nav" data-simplebar>
                     <li class="nav-item">
+                        <a href="/Home/Index" class="nav-link">
+                            <span class="icon"><i class="flaticon-home"></i></span>
+                            <span class="menu-title">HOME</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="/NewsFeed/Index" class="nav-link">
                             <span class="icon"><i class="flaticon-newspaper"></i></span>
                             <span class="menu-title">News Feed</span>
                         </a>
                     </li>
-                    @* <li class="nav-item">
-                    <a href="notifications.html" class="nav-link">
-                    <span class="icon"><i class="flaticon-bell"></i></span>
-                    <span class="menu-title">Notifications</span>
-                    </a>
-                    </li> *@
-                    <li class="nav-item active">
+                    <li class="nav-item">
                         <a href="/Message/Chat" class="nav-link">
                             <span class="icon"><i class="flaticon-comment-1"></i></span>
                             <span class="menu-title">Messages</span>
@@ -821,7 +821,7 @@
         <!-- Start Right Sidebar Area -->
         <div class="right-sidebar-area" data-simplebar>
             <div class="chat-body" data-simplebar>
-                <div class="chat-item">
+                <div class="chat-item" style="margin:auto;">
                     @await Component.InvokeAsync("Users")
                 </div>
             </div>
