@@ -1,7 +1,5 @@
 ﻿
-
-function GetAllUsers()
-{
+function GetAllUsersLayout() {
     $.ajax({
         url: "/Home/GetAllUsers",
         method: "GET",
@@ -20,24 +18,18 @@ function GetAllUsers()
                 }
 
                 const item = `
-                    <div class="card" style="${style};width:220px;margin:5px;">
+                    <div class="card" style="${style};width:100px;height:100px;margin:5px;border-radius:50%">
 
-                        <img style="width:100%;height:220px;" src="/images/${data[i].image}" />
-                        <div class="card-body">
-                            <h5 class="card-title">${data[i].userName}</5>
-                            <p class="card-text">${data[i].email} </p>
-                        </div>
+                        <img style="width:100%;height:100%;border-radius:50%" src="/images/${data[i].image}" />
 
                     </div>
                 `;
                 content += item;
 
             }
-            $("#allUsers").html(content);
+            $("#allUsers2").html(content);
 
         }
 
     })
 }
-
-GetAllUsers();

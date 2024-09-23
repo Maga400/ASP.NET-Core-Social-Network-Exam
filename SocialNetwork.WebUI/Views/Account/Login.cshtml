@@ -1,4 +1,6 @@
-﻿@{
+﻿@model LoginViewModel
+
+@{
     Layout = null;
 }
 
@@ -36,13 +38,13 @@
 
     <!-- Start Preloader Area -->
     @* <div class="preloader-area">
-        <div class="spinner">
-            <div class="inner">
-                <div class="disc"></div>
-                <div class="disc"></div>
-                <div class="disc"></div>
-            </div>
-        </div>
+    <div class="spinner">
+    <div class="inner">
+    <div class="disc"></div>
+    <div class="disc"></div>
+    <div class="disc"></div>
+    </div>
+    </div>
     </div> *@
     <!-- End Preloader Area -->
     <!-- Start Preloader Area -->
@@ -66,30 +68,59 @@
                     <div class="login-form">
                         <h2>Login</h2>
 
-                        <form>
+                        <form asp-controller="Account" asp-action="Login" method="post" role="form">
                             <div class="form-group">
-                                <label>Username or email</label>
-                                <input type="text" class="form-control">
+                                <label asp-for="Username"></label>
+                                <input asp-for="Username" class="form-control" />
+                                <span asp-validation-for="Username"></span>
+
                             </div>
 
                             <div class="form-group">
-                                <label>Password</label>
-                                <input type="password" class="form-control">
+                                <label asp-for="Password"></label>
+                                <input asp-for="Password" class="form-control" />
+                                <span asp-validation-for="Password"></span>
+
                             </div>
 
-                            <div class="remember-me-wrap d-flex justify-content-between align-items-center">
-                                <p>
-                                    <input type="checkbox" id="test1">
-                                    <label for="test1">Remember me</label>
-                                </p>
-
-                                <div class="lost-your-password-wrap">
-                                    <a href="forgot-password.html" class="lost-your-password">Forgot password ?</a>
+                            <div class="input-group">
+                                <div class="checkbox">
+                                    <label>
+                                        <input asp-for="RememberMe" /> Remember Me
+                                    </label>
                                 </div>
                             </div>
-                            <button type="submit" class="default-btn">Login</button>
-                            <div class="or-text"><span>Or</span></div>
-                            <button type="submit" class="google-btn">Log In with Google</button>
+
+                            <div style="margin-top:10px" class="form-group">
+                                <div class="col-sm-12 controls">
+                                    <input type="submit" class="btn-success" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-12 control">
+                                    <div style="border-top:1px solid #888;padding-top:15px;font-size:85%">
+                                        Don't have an account!
+                                        <a asp-controller="Account" asp-action="Register">
+                                            Sign Up Here
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+@* 
+                            <div class="remember-me-wrap d-flex justify-content-between align-items-center">
+                                <div class="checkbox">
+
+                                    <input asp-for="RememberMe" value="RememberMe" />
+
+
+                                </div>
+                            </div>
+
+                            <div style="margin-top:10px;" class="form-group">
+
+                                <input type="submit" class="default-btn" value="Login" />
+                            </div> *@
                         </form>
                     </div>
                 </div>
