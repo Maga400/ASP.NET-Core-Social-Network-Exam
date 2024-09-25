@@ -17,7 +17,6 @@ namespace SocialNetwork.DataAccess.Repositories.Concretes
         {
             _context = context;
         }
-
         public async Task AddAsync(CustomIdentityUser user)
         {
             await _context.Users.AddAsync(user);
@@ -32,14 +31,12 @@ namespace SocialNetwork.DataAccess.Repositories.Concretes
 
         public async Task<List<CustomIdentityUser>> GetAllAsync()
         {
-            var users = await _context.Users.ToListAsync();
-            return users;
+            return await _context.Users.ToListAsync();
         }
 
         public async Task<CustomIdentityUser> GetByIdAsync(string id)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
-            return user;
+            return await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task UpdateAsync(CustomIdentityUser user)

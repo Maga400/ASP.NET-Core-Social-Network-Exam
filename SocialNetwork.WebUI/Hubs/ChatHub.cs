@@ -42,5 +42,10 @@ namespace SocialNetwork.WebUI.Hubs
 
         }
 
+        public async Task SendFollow(string id)
+        {
+            await Clients.User(id).SendAsync("ReceiveNotification");
+        }
+
     }
 }

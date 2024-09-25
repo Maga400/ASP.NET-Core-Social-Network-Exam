@@ -1,7 +1,7 @@
 ﻿
 function GetAllUsersLayout() {
     $.ajax({
-        url: "/Home/GetAllUsers",
+        url: "/Home/GetAllUsersForLayout",
         method: "GET",
         success: function (data) {
             let content = "";

@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SocialNetwork.WebUI.Controllers
 {
+    [Authorize]
     public class FriendsController : Controller
     {
         // GET: FriendsController

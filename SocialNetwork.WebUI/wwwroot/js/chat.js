@@ -9,13 +9,14 @@ connection.start().then(function () {
     .catch(function (err) {
         return console.error(err.toString());
     })
+
 const element = document.querySelector("#alert");
 element.style.display = "none";
 
 
 connection.on("Connect", function (info) {
-    GetAllUsersLayout();
     GetAllUsers();
+    GetAllUsersLayout();
     element.style.display = "block";
     element.innerHTML = info;
     setTimeout(() => {
@@ -25,12 +26,22 @@ connection.on("Connect", function (info) {
 })
 
 connection.on("Disconnect", function (info) {
-    GetAllUsersLayout();
     GetAllUsers();
+    GetAllUsersLayout();
     element.style.display = "block";
     element.innerHTML = info;
     setTimeout(() => {
         element.innerHTML = "";
         element.style.display = "none";
     }, 5000);
+})
+
+async function SendFollowCall(id) {
+    await connection.invoke("SendFollow",id);
+}
+
+connection.on("ReceiveNotification", function () {
+    GetMyRequests();
+    GetAllUsers();
+    GetAllFriends();
 })

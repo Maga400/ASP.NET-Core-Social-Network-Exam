@@ -19,6 +19,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IImageService,ImageService>();
 builder.Services.AddScoped<ICustomIdentityUserDAL, CustomIdentityUserDAL>();
 builder.Services.AddScoped<ICustomIdentityUserService, CustomIdentityUserService>();
+builder.Services.AddScoped<IFriendDAL, FriendDAL>();
+builder.Services.AddScoped<IFriendService, FriendService>();
+builder.Services.AddScoped<IFriendRequestDAL, FriendRequestDAL>();
+builder.Services.AddScoped<IFriendRequestService, FriendRequestService>();
 
 var connection = builder.Configuration.GetConnectionString("Default");
 
