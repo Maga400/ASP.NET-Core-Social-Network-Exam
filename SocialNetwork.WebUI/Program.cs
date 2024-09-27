@@ -16,6 +16,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(opt =>
+    {
+        opt.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
+
 builder.Services.AddScoped<IImageService,ImageService>();
 builder.Services.AddScoped<ICustomIdentityUserDAL, CustomIdentityUserDAL>();
 builder.Services.AddScoped<ICustomIdentityUserService, CustomIdentityUserService>();
@@ -23,6 +29,10 @@ builder.Services.AddScoped<IFriendDAL, FriendDAL>();
 builder.Services.AddScoped<IFriendService, FriendService>();
 builder.Services.AddScoped<IFriendRequestDAL, FriendRequestDAL>();
 builder.Services.AddScoped<IFriendRequestService, FriendRequestService>();
+builder.Services.AddScoped<IChatDAL, ChatDAL>();
+builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IMessageDAL, MessageDAL>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 
 var connection = builder.Configuration.GetConnectionString("Default");
 

@@ -18,13 +18,19 @@ namespace SocialNetwork.WebUI.Controllers
         private readonly ICustomIdentityUserService _customIdentityUserService;
         private readonly IFriendService _friendService;
         private readonly IFriendRequestService _friendRequestService;
-        public HomeController(ILogger<HomeController> logger, UserManager<CustomIdentityUser> userManager, ICustomIdentityUserService customIdentityUserService, IFriendService friendService, IFriendRequestService friendRequestService)
+        private readonly IChatService _chatService;
+        private readonly IMessageService _messageService;
+        private readonly SocialNetworkDbContext _context;
+        public HomeController(ILogger<HomeController> logger, UserManager<CustomIdentityUser> userManager, ICustomIdentityUserService customIdentityUserService, IFriendService friendService, IFriendRequestService friendRequestService, IChatService chatService, IMessageService messageService, SocialNetworkDbContext context)
         {
             _logger = logger;
             _userManager = userManager;
             _customIdentityUserService = customIdentityUserService;
             _friendService = friendService;
             _friendRequestService = friendRequestService;
+            _chatService = chatService;
+            _messageService = messageService;
+            _context = context;
         }
 
         public async Task<IActionResult> Index()
@@ -35,40 +41,29 @@ namespace SocialNetwork.WebUI.Controllers
             return View();
         }
 
-        public async Task<IActionResult> GetAllFriends()
-        {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            var requests = await _friendRequestService.GetAllAsync();
-            var datas = await _customIdentityUserService.GetAllAsync();
-            var myRequests = requests.Where(r => r.SenderId == user.Id);
-            var friends = await _friendService.GetAllAsync();
-            var myFriends = friends.Where(f => f.OwnId == user.Id || f.YourFriendId == user.Id);
+        //public async Task<IActionResult> GetAllFriends()
+        //{
+        //    var user = await _userManager.GetUserAsync(HttpContext.User);
+        //    var requests = await _friendRequestService.GetAllAsync();
+        //    var datas = await _customIdentityUserService.GetAllAsync();
+        //    var myRequests = requests.Where(r => r.SenderId == user.Id);
+        //    var friends = await _friendService.GetAllAsync();
+        //    var myFriends = friends.Where(f => f.OwnId == user.Id || f.YourFriendId == user.Id);
 
-            var friendUsers = datas
-            .Where(u => myFriends.Any(f => f.OwnId == u.Id || f.YourFriendId == u.Id) && u.Id != user.Id)
-            .Select(u => new CustomIdentityUser
-            {
-                Id = u.Id,
-                IsOnline = u.IsOnline,
-                UserName = u.UserName,
-                Image = u.Image,
-                Email = u.Email
-            })
-            .ToList();
+        //    var friendUsers = datas
+        //    .Where(u => myFriends.Any(f => f.OwnId == u.Id || f.YourFriendId == u.Id) && u.Id != user.Id)
+        //    .Select(u => new CustomIdentityUser
+        //    {
+        //        Id = u.Id,
+        //        IsOnline = u.IsOnline,
+        //        UserName = u.UserName,
+        //        Image = u.Image,
+        //        Email = u.Email
+        //    })
+        //    .ToList();
 
-
-            //foreach (var item in users)
-            //{
-            //    var request = myRequests.FirstOrDefault(r => r.ReceiverId == item.Id && r.Status == "Request");
-            //    if (request != null)
-            //    {
-            //        item.HasRequestPending = true;
-            //        //await _customIdentityUserService.UpdateAsync(item);
-            //    }
-            //}
-
-            return Ok(friendUsers);
-        }
+        //    return Ok(friendUsers);
+        //}
         public async Task<IActionResult> GetAllUsersForLayout()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
@@ -91,17 +86,6 @@ namespace SocialNetwork.WebUI.Controllers
                     Email = u.Email,
 
                 }).ToList();
-
-
-            //foreach (var item in users)
-            //{
-            //    var request = myRequests.FirstOrDefault(r => r.ReceiverId == item.Id && r.Status == "Request");
-            //    if (request != null)
-            //    {
-            //        item.HasRequestPending = true;
-            //        //await _customIdentityUserService.UpdateAsync(item);
-            //    }
-            //}
 
             return Ok(users);
         }
@@ -127,17 +111,6 @@ namespace SocialNetwork.WebUI.Controllers
                     Email = u.Email,
 
                 }).Where(u => u.IsFriend == false).ToList();
-           
-
-            //foreach (var item in users)
-            //{
-            //    var request = myRequests.FirstOrDefault(r => r.ReceiverId == item.Id && r.Status == "Request");
-            //    if (request != null)
-            //    {
-            //        item.HasRequestPending = true;
-            //        //await _customIdentityUserService.UpdateAsync(item);
-            //    }
-            //}
 
             return Ok(users);
         }
@@ -185,8 +158,8 @@ namespace SocialNetwork.WebUI.Controllers
 
             return Ok(requests);
         }
-        [HttpGet]
 
+        [HttpGet]
         public async Task<IActionResult> DeclineRequest(int id, string senderid)
         {
             try
@@ -219,6 +192,9 @@ namespace SocialNetwork.WebUI.Controllers
             var receiverUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
             var sender = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == senderId);
 
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var chat = await _context.Chats.Include(nameof(Chat.Messages)).FirstOrDefaultAsync(c => c.SenderId == user.Id && c.ReceiverId == receiverUser.Id || c.ReceiverId == user.Id && c.SenderId == receiverUser.Id);
+
             if (receiverUser != null)
             {
                 await _friendRequestService.AddAsync(new FriendRequest
@@ -241,6 +217,19 @@ namespace SocialNetwork.WebUI.Controllers
                 });
 
                 await _userManager.UpdateAsync(receiverUser);
+
+                if (chat == null)
+                {
+                    chat = new Chat
+                    {
+                        ReceiverId = receiverUser.Id,
+                        SenderId = user.Id,
+                        Messages = new List<Message>()
+                    };
+
+                    await _context.Chats.AddAsync(chat);
+                    await _context.SaveChangesAsync();
+                }
 
                 return Ok();
             }
@@ -272,9 +261,14 @@ namespace SocialNetwork.WebUI.Controllers
             var user = await _userManager.GetUserAsync(HttpContext.User);
             var friends = await _friendService.GetAllAsync();
             var friend = friends.FirstOrDefault(f => f.YourFriendId == user.Id && f.OwnId == id || f.OwnId == user.Id && f.YourFriendId == id);
+            var chats = await _chatService.GetAllAsync();
+            var chat = chats.FirstOrDefault(c => c.ReceiverId == friend.YourFriendId && c.SenderId == friend.OwnId || c.ReceiverId == friend.OwnId && c.SenderId == friend.YourFriendId);
+
+
             if(friend != null) 
             {
                 await _friendService.DeleteAsync(friend);
+                await _chatService.DeleteAsync(chat);
                 return Ok();
             }
 

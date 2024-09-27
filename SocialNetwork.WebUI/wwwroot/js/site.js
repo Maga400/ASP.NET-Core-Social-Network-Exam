@@ -52,9 +52,55 @@ function GetAllUsers() {
     })
 }
 
+GetAllUsers();
+GetMyRequests();
+function GetMessages(receiverId, senderId) {
+    $.ajax({
+        url: `/Message/GetAllMessages?receiverId=${receiverId}&senderId=${senderId}`,
+        method: "GET",
+        success: function (data) {
+            let content = "";
+            for (var i = 0; i < data.messages.length; i++) {
+                let dateTime = new Date(data.messages[i].dateTime);
+                let hour = dateTime.getHours();
+                let minute = dateTime.getMinutes();
+                let item = `<section style="display:flex;margin-top:25px;border:2px solid black;
+margin-left:10px;border-radius:10px;background-color:lightgrey;min-width:20%;max-width:90%;">
+
+                                        <h5 style="margin-left:10px;margin-top:15px;margin-right:10px;font-size:1em;">${data.messages[i].content}</h5>
+                                        <p style="margin-top:20px;margin-right:10px;font-size:0.9em">${hour}:${minute}</p>
+                                        
+                                    </section>`;
+                content += item;
+            }
+            console.log(data);
+            $("#currentMessages").html(content);
+        }
+    })
+}
+
+function SendMessage(receiverId, senderId) {
+    const content = document.querySelector("#message-input");
+    let obj = {
+        receiverId: receiverId,
+        senderId: senderId,
+        content: content.value
+    };
+
+    $.ajax({
+        url: `/Message/AddMessage`,
+        method: "POST",
+        data: obj,
+        success: function (data) {
+            GetMessageCall(receiverId, senderId);
+            content.value = "";
+        }
+    })
+}
+
 function GetAllFriends() {
     $.ajax({
-        url: "/Home/GetAllFriends",
+        url: "/Friends/GetAllFriends",
         method: "GET",
         success: function (data) {
             let content = "";
@@ -79,7 +125,7 @@ function GetAllFriends() {
                             <p class="card-text">${data[i].email} </p>
                             <div style='display:flex;justify-content:center;'>
                                 <button class='btn btn-outline-secondary' style="width:45%;height:30px;font-size:0.6em;" onclick="UnfollowUser('${data[i].id}')" >UnFollow</button>
-                                <button class='btn btn-outline-primary' style="width:45%;height:30px;font-size:0.6em;margin-left:10%;" >Send Message</button>
+                                <a class='btn btn-outline-primary' style="width:45%;height:30px;font-size:0.6em;margin-left:10%;" href='/Message/GoChat/${data[i].id}' >Send Message</a>
                             
                             </div>
                         </div>
@@ -92,10 +138,10 @@ function GetAllFriends() {
             $("#allFriends").html(content);
 
         }
-
     })
 }
 
+GetAllFriends();
 function TakeRequest(id) {
     const element = document.querySelector("#alert");
     element.style.display = "none";
@@ -236,10 +282,9 @@ function UnfollowUser(id) {
             SendFollowCall(id);
             GetAllUsers();
             GetAllFriends();
+            //window.location.href = '/Message/GoChat';
         }
     });
 }
 
 
-GetAllUsers();
-GetMyRequests();

@@ -47,5 +47,10 @@ namespace SocialNetwork.WebUI.Hubs
             await Clients.User(id).SendAsync("ReceiveNotification");
         }
 
+        public async Task GetMessages(string receiverId, string senderId)
+        {
+            await Clients.Users(new String[] { receiverId, senderId }).SendAsync("ReceiveMessages", receiverId, senderId);
+        }
+
     }
 }
