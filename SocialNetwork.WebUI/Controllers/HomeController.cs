@@ -21,7 +21,9 @@ namespace SocialNetwork.WebUI.Controllers
         private readonly IChatService _chatService;
         private readonly IMessageService _messageService;
         private readonly SocialNetworkDbContext _context;
-        public HomeController(ILogger<HomeController> logger, UserManager<CustomIdentityUser> userManager, ICustomIdentityUserService customIdentityUserService, IFriendService friendService, IFriendRequestService friendRequestService, IChatService chatService, IMessageService messageService, SocialNetworkDbContext context)
+        private readonly INotificationService _notificationService;
+
+        public HomeController(ILogger<HomeController> logger, UserManager<CustomIdentityUser> userManager, ICustomIdentityUserService customIdentityUserService, IFriendService friendService, IFriendRequestService friendRequestService, IChatService chatService, IMessageService messageService, SocialNetworkDbContext context, INotificationService notificationService)
         {
             _logger = logger;
             _userManager = userManager;
@@ -31,6 +33,7 @@ namespace SocialNetwork.WebUI.Controllers
             _chatService = chatService;
             _messageService = messageService;
             _context = context;
+            _notificationService = notificationService;
         }
 
         public async Task<IActionResult> Index()
@@ -137,6 +140,23 @@ namespace SocialNetwork.WebUI.Controllers
             return BadRequest();
         }
 
+        public async Task<IActionResult> SharePost(string text)
+        {
+            var sender = await _userManager.GetUserAsync(HttpContext.User);
+
+            var notification = new Notification
+            {
+                Content = $"{sender.UserName} share a new post at {DateTime.Now.ToLongDateString()}\nPost => {text}",
+                UserId = sender.Id,
+                User = sender,
+                Status = "Notification"
+            };
+
+            await _notificationService.AddAsync(notification);
+            return Ok();
+
+        }
+
         [HttpDelete]
         public async Task<IActionResult> TakeRequest(string id)
         {
@@ -157,6 +177,15 @@ namespace SocialNetwork.WebUI.Controllers
             var requests = friendRequests.Where(r => r.ReceiverId == current.Id);
 
             return Ok(requests);
+        }
+
+        public async Task<IActionResult> GetAllNotification()
+        {
+            var allNotifications = await _notificationService.GetAllAsync();
+            var current = await _userManager.GetUserAsync(HttpContext.User);
+            //var notifications = allNotifications.Where(r => r.ReceiverId == current.Id);
+            //Task.Delay(1000);
+            return Ok(new { notifications = allNotifications,currentId = current.Id });
         }
 
         [HttpGet]
@@ -265,7 +294,7 @@ namespace SocialNetwork.WebUI.Controllers
             var chat = chats.FirstOrDefault(c => c.ReceiverId == friend.YourFriendId && c.SenderId == friend.OwnId || c.ReceiverId == friend.OwnId && c.SenderId == friend.YourFriendId);
 
 
-            if(friend != null) 
+            if (friend != null)
             {
                 await _friendService.DeleteAsync(friend);
                 await _chatService.DeleteAsync(chat);
@@ -273,7 +302,7 @@ namespace SocialNetwork.WebUI.Controllers
             }
 
             return NotFound();
-        
+
         }
 
         public IActionResult Privacy()

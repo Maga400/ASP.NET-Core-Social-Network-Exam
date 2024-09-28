@@ -54,6 +54,7 @@ function GetAllUsers() {
 
 GetAllUsers();
 GetMyRequests();
+GetNotifications();
 function GetMessages(receiverId, senderId) {
     $.ajax({
         url: `/Message/GetAllMessages?receiverId=${receiverId}&senderId=${senderId}`,
@@ -179,6 +180,26 @@ function SendFollow(id) {
         }
     })
 }
+function SharePost() {
+    const element = document.querySelector("#alert");
+    element.style.display = "none";
+    alert("Salam");
+    let text = "Hello";
+    $.ajax({
+        url: `/Home/SharePost?text=${text}`,
+        method: "GET",
+        success: function (data) {
+            element.style.display = "block";
+            element.innerHTML = "Your post shared successfully";
+            SharePostCall();
+            //GetAllUsers();
+            setTimeout(() => {
+                element.innerHTML = "";
+                element.style.display = "none";
+            }, 5000);
+        }
+    })
+}
 function GetMyRequests() {
     $.ajax({
         url: "/Home/GetAllRequests",
@@ -213,6 +234,41 @@ function GetMyRequests() {
                 </div>`;
 
                 content += item;
+            }
+            $("#requests").html(content);
+        }
+    });
+}
+
+function GetNotifications() {
+    $.ajax({
+        url: "/Home/GetAllNotification",
+        method: "GET",
+        success: function (data) {
+            let content = '';
+            let subContent = '';
+            for (let i = 0; i < data.notifications.length; i++) {
+
+                //subContent = `
+                //    <div class="card-body">
+                //        <button class="btn btn-warning" onclick="DeleteRequest(${data[i].id})">Delete</button>
+                //    </div>`;
+
+                if (data.currentId != data.notifications[i].userId) {
+                    let item = `
+                    <div class="card" style="width:100%;background-color:lightgrey;margin-top:50px;">
+                        <div class="card-body">
+                            <h5 style="color:red;">${data.notifications[i].status}</h5>
+                            <ul class="list-group list-group-flush">
+                                <li style="font-size:1em;list-style:none;">${data.notifications[i].content}</li>
+                            </ul>
+                        
+                        </div>
+                    </div>`;
+                    content += item;
+
+                }
+
             }
             $("#requests").html(content);
         }

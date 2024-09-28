@@ -47,7 +47,13 @@ async function GetMessageCall(receiverId, senderId) {
 async function SendFollowCall(id) {
     await connection.invoke("SendFollow",id);
 }
-
+async function SharePostCall() {
+    await connection.invoke("SharePost");
+}
+connection.on("ReceivePostNotification", function () {
+    GetNotifications();
+    //GetAllUsers();
+})
 connection.on("ReceiveNotification", function () {
     GetMyRequests();
     GetAllUsers();

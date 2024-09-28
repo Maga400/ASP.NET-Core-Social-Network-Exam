@@ -14,13 +14,14 @@ namespace SocialNetwork.Entities.Entities
         public string? ConnectTime { get; set; } = "";
         public virtual ICollection<Friend>? Friends { get; set; }
         public virtual ICollection<FriendRequest>? FriendRequests { get; set; }
-        
+        public virtual ICollection<Notification>? Notifications { get; set; }
         public virtual ICollection<Chat>? Chats { get; set; }
         public CustomIdentityUser()
         {
             Friends = new List<Friend>();
             FriendRequests = new List<FriendRequest>();
             Chats = new List<Chat>();
+            Notifications = new List<Notification>();
         }
 
     }

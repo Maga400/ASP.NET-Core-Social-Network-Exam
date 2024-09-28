@@ -33,6 +33,8 @@ builder.Services.AddScoped<IChatDAL, ChatDAL>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IMessageDAL, MessageDAL>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<INotificationDAL, NotificationDAL>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 var connection = builder.Configuration.GetConnectionString("Default");
 
@@ -41,7 +43,14 @@ builder.Services.AddDbContext<SocialNetworkDbContext>(options =>
     options.UseSqlServer(connection);
 });
 
-builder.Services.AddIdentity<CustomIdentityUser, CustomIdentityRole>()
+builder.Services.AddIdentity<CustomIdentityUser, CustomIdentityRole>(options =>
+{
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireDigit = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+})
     .AddEntityFrameworkStores<SocialNetworkDbContext>()
     .AddDefaultTokenProviders();
 
