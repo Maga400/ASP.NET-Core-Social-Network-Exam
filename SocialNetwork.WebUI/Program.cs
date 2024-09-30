@@ -35,6 +35,10 @@ builder.Services.AddScoped<IMessageDAL, MessageDAL>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<INotificationDAL, NotificationDAL>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<ICommentDAL, CommentDAL>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IPostDAL, PostDAL>();
+builder.Services.AddScoped<IPostService, PostService>();
 
 var connection = builder.Configuration.GetConnectionString("Default");
 

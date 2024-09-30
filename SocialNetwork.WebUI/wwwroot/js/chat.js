@@ -50,10 +50,20 @@ async function SendFollowCall(id) {
 async function SharePostCall() {
     await connection.invoke("SharePost");
 }
+async function GetAllPostsCall() {
+    await connection.invoke("GetAllPosts");
+}
+
+connection.on("ReceiveAllPosts", function () {
+    GetAllPosts();
+    GetMyPosts();
+
+})
 connection.on("ReceivePostNotification", function () {
     GetNotifications();
-    //GetAllUsers();
+    GetAllPosts();
 })
+
 connection.on("ReceiveNotification", function () {
     GetMyRequests();
     GetAllUsers();

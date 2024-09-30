@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Business.Services.Abstracts;
+using SocialNetwork.Business.Services.Concretes;
 using SocialNetwork.DataAccess.Data;
 using SocialNetwork.Entities.Entities;
 using SocialNetwork.WebUI.Models;
@@ -22,8 +23,10 @@ namespace SocialNetwork.WebUI.Controllers
         private readonly IMessageService _messageService;
         private readonly SocialNetworkDbContext _context;
         private readonly INotificationService _notificationService;
+        private readonly IPostService _postService;
+        private readonly ICommentService _commentService;
 
-        public HomeController(ILogger<HomeController> logger, UserManager<CustomIdentityUser> userManager, ICustomIdentityUserService customIdentityUserService, IFriendService friendService, IFriendRequestService friendRequestService, IChatService chatService, IMessageService messageService, SocialNetworkDbContext context, INotificationService notificationService)
+        public HomeController(ILogger<HomeController> logger, UserManager<CustomIdentityUser> userManager, ICustomIdentityUserService customIdentityUserService, IFriendService friendService, IFriendRequestService friendRequestService, IChatService chatService, IMessageService messageService, SocialNetworkDbContext context, INotificationService notificationService, IPostService postService, ICommentService commentService)
         {
             _logger = logger;
             _userManager = userManager;
@@ -34,6 +37,8 @@ namespace SocialNetwork.WebUI.Controllers
             _messageService = messageService;
             _context = context;
             _notificationService = notificationService;
+            _postService = postService;
+            _commentService = commentService;
         }
 
         public async Task<IActionResult> Index()
@@ -140,21 +145,73 @@ namespace SocialNetwork.WebUI.Controllers
             return BadRequest();
         }
 
+
+        public async Task<IActionResult> SendComment(int id, string message)
+        {
+            var post = await _postService.GetByIdAsync(id);
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            if (post != null)
+            {
+                var comment = new Comment
+                {
+                    PostId = post.Id,
+                    Post = post,
+                    Content = message,
+                    WritingDate = DateTime.Now,
+                    Sender = user,
+                    SenderId = user.Id,
+                };
+
+                post.CommentCount += 1;
+
+                await _postService.UpdateAsync(post);
+                await _commentService.AddAsync(comment);
+            }
+
+            return Ok();
+        }
+
+        public async Task<IActionResult> SendLike(int id)
+        {
+            var post = await _postService.GetByIdAsync(id);
+            if (post != null)
+            {
+
+                post.LikeCount += 1;
+
+                await _postService.UpdateAsync(post);
+            }
+
+            return Ok();
+        }
         public async Task<IActionResult> SharePost(string text)
         {
             var sender = await _userManager.GetUserAsync(HttpContext.User);
 
             var notification = new Notification
             {
-                Content = $"{sender.UserName} share a new post at {DateTime.Now.ToLongDateString()}\nPost => {text}",
+                Content = $"{sender.UserName} share a new post at {DateTime.Now.ToLongDateString()}",
                 UserId = sender.Id,
                 User = sender,
                 Status = "Notification"
             };
 
-            await _notificationService.AddAsync(notification);
-            return Ok();
+            var post = new Post
+            {
+                Text = text,
+                ShareDate = DateTime.Now,
+                SenderId = sender.Id,
+                Sender = sender,
+                ImagePath = "",
+                LikeCount = 0,
+                CommentCount = 0,
+                Comments = new List<Comment>()
+            };
 
+            await _notificationService.AddAsync(notification);
+            await _postService.AddAsync(post);
+
+            return Ok();
         }
 
         [HttpDelete]
@@ -185,8 +242,17 @@ namespace SocialNetwork.WebUI.Controllers
             var current = await _userManager.GetUserAsync(HttpContext.User);
             //var notifications = allNotifications.Where(r => r.ReceiverId == current.Id);
             //Task.Delay(1000);
-            return Ok(new { notifications = allNotifications,currentId = current.Id });
+            return Ok(new { notifications = allNotifications, currentId = current.Id });
         }
+
+        //public async Task<IActionResult> GetAllPosts()
+        //{
+        //    var allPosts = await _postService.GetAllAsync();
+        //    var current = await _userManager.GetUserAsync(HttpContext.User);
+        //    //var notifications = allNotifications.Where(r => r.ReceiverId == current.Id);
+        //    //Task.Delay(1000);
+        //    return Ok(new { posts = allPosts, currentId = current.Id, currentImage = current.Image });
+        //}
 
         [HttpGet]
         public async Task<IActionResult> DeclineRequest(int id, string senderid)

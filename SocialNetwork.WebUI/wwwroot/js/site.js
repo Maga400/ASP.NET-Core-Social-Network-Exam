@@ -180,26 +180,34 @@ function SendFollow(id) {
         }
     })
 }
-function SharePost() {
-    const element = document.querySelector("#alert");
-    element.style.display = "none";
-    alert("Salam");
-    let text = "Hello";
+
+
+function SharePost(e) {
+    //const element = document.querySelector("#alert");
+    //element.style.display = "none";
+
+    e.preventDefault();
+    let textArea = document.querySelector("#textArea").value;
+    //alert(textArea.value);
+
     $.ajax({
-        url: `/Home/SharePost?text=${text}`,
+        url: `/Home/SharePost?text=${textArea}`,
         method: "GET",
         success: function (data) {
-            element.style.display = "block";
-            element.innerHTML = "Your post shared successfully";
+            //element.style.display = "block";
+            //element.innerHTML = "Your post shared successfully";
+
+            GetAllPosts();
             SharePostCall();
-            //GetAllUsers();
-            setTimeout(() => {
-                element.innerHTML = "";
-                element.style.display = "none";
-            }, 5000);
+
+            //setTimeout(() => {
+            //    element.innerHTML = "";
+            //    element.style.display = "none";
+            //}, 5000);
         }
     })
 }
+
 function GetMyRequests() {
     $.ajax({
         url: "/Home/GetAllRequests",
@@ -239,7 +247,6 @@ function GetMyRequests() {
         }
     });
 }
-
 function GetNotifications() {
     $.ajax({
         url: "/Home/GetAllNotification",
@@ -275,6 +282,486 @@ function GetNotifications() {
     });
 }
 
+function SendComment(id, e) {
+    e.preventDefault();
+
+    let textArea = document.querySelector(`#message${id}`).value;
+
+    $.ajax({
+        url: `/Home/SendComment?id=${id}&message=${textArea}`,
+        method: "GET",
+        success: function (data) {
+            //SharePostCall();
+            GetAllPosts();
+            GetMyPosts();
+            GetAllPostsCall();
+        }
+    });
+}
+
+function SendLike(id) {
+
+    $.ajax({
+        url: `/Home/SendLike/${id}`,
+        method: "GET",
+        success: function (data) {
+            //SharePostCall();
+            GetAllPosts();
+            GetMyPosts();
+            GetAllPostsCall();
+        }
+    });
+}
+
+function GetAllPosts() {
+    $.ajax({
+        url: "/NewsFeed/GetAllPosts",
+        method: "GET",
+        success: function (data) {
+            let content = '';
+
+            for (let i = 0; i < data.posts.length; i++) {
+
+                //subContent = `
+                //    <div class="card-body">
+                //        <button class="btn btn-warning" onclick="DeleteRequest(${data[i].id})">Delete</button>
+                //    </div>`;
+                let subContent = '';
+
+                if (data.currentId != data.posts[i].senderId) {
+
+                    if (data.posts[i].comments.length != 0) {
+                        for (var j = 0; j < data.posts[i].comments.length; j++) {
+                            var comment = data.posts[i].comments[j];
+                            let dateTime = new Date(comment.writingDate);
+                            let year = dateTime.getFullYear();
+                            let month = dateTime.getMonth() + 1;
+                            let day = dateTime.getDate();
+                            let hours = dateTime.getHours();
+                            let minutes = dateTime.getMinutes();
+
+                            subContent += `
+                            <div class="post-comment-list">
+                                <div class="comment-list" style="display:flex;justify-content:start;width:100%;padding:30px">
+                                    <div class="comment-image" style="width:5%;">
+                                        <a href="my-profile.html"><img style="height:50px;width:50px;" src="/images/${comment.sender.image}" class="rounded-circle" alt="image"></a>
+                                    </div>
+                                    <div class="comment-info" style="width:92%;margin-left:3%;">
+                                        <h3>
+                                            <a href="my-profile.html">${comment.sender.userName}</a>
+                                        </h3>
+                                        <span>${year}-${month}-${day} ${hours}:${minutes}</span>
+                                        <p>${comment.content}</p>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        }
+                    }
+
+                    let item = `
+                    <div class="news-feed news-feed-post" style="background-color:white;margin-top:50px;">
+                        <div class="post-header d-flex justify-content-between align-items-center" style="padding:30px;">
+                            <div class="image">
+                                <a href="#"><img src="/images/${data.posts[i].sender.image}" class="rounded-circle" style="height:150px;width:150px;" alt="image"></a>
+                            </div>
+                            <div class="info ms-3">
+                                <span class="name" style="display:block;"><a href="#" style="font-weight:bold;font-size:1.5em">${data.posts[i].sender.userName}</a></span>
+                                <span class="small-text" style="display:block;margin-top:15px;"><a href="#">${data.posts[i].shareDate}</a></span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="flaticon-menu"></i></button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-edit"></i> Edit Post</a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-private"></i> Hide Post</a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-trash"></i> Delete Post</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="post-body">
+                            <p style="font-size:1.2em;font-weight:bold;margin:30px;">${data.posts[i].text}</p>
+                            
+                            
+                            <ul class="post-meta-wrap d-flex justify-content-between align-items-center" style="padding:30px;list-style:none;">
+                                <li class="post-react" onclick="SendLike(${data.posts[i].id})">
+                                    <a href="#"><i class="flaticon-like"></i><span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
+
+                                </li>
+                                <li class="post-comment">
+                                    <a href="#"><i class="flaticon-comment"></i><span style="margin-left:5px;">Comment</span> <span style="margin-left:5px;" class="number">${data.posts[i].commentCount}</span></a>
+                                </li>
+                                <li class="post-share">
+                                    <a href="#"><i class="flaticon-share"></i><span style="margin-left:5px;">Share</span> <span style="margin-left:5px;" class="number">0</span></a>
+                                </li>
+                            </ul>
+
+                            ${subContent}
+
+                            <form class="post-footer" style="display:flex;justify-content:start;width:100%;padding:30px;">
+                                <div class="footer-image">
+                                    <a href="#"><img src="/images/${data.currentImage}" class="rounded-circle" style="width:50px;height:50px;" alt="image"></a>
+                                </div>
+                                <div class="form-group" style="display:flex;justify-content:start;width:98%;margin-left:3%">
+                                    <textarea style="width:80%%;" id="message${data.posts[i].id}" name="message" class="form-control" placeholder="Write a comment..."></textarea>
+                      
+                                    <button type="submit" style="width:15%;background-color:red;color:white;font-size:1em;margin-left:20px;" onclick="SendComment(${data.posts[i].id},event)">Send</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>`;
+                    content += item;
+                    //317 share image part
+                    //<div class="post-image">
+                    //    <img src="assets/images/news-feed-post/post-4.jpg" alt="image">
+                    //</div>
+
+                }
+
+            }
+
+            $("#posts").html(content);
+        }
+    });
+}
+
+function GetAllPosts2() {
+    $.ajax({
+        url: "/NewsFeed/GetAllPosts",
+        method: "GET",
+        success: function (data) {
+            let content = '';
+
+            for (let i = 0; i < data.posts.length; i++) {
+
+                //subContent = `
+                //    <div class="card-body">
+                //        <button class="btn btn-warning" onclick="DeleteRequest(${data[i].id})">Delete</button>
+                //    </div>`;
+                let subContent = '';
+
+                if (data.currentId != data.posts[i].senderId) {
+
+                    if (data.posts[i].comments.length != 0) {
+                        for (var j = 0; j < data.posts[i].comments.length; j++) {
+                            var comment = data.posts[i].comments[j];
+                            let dateTime = new Date(comment.writingDate);
+                            let year = dateTime.getFullYear();
+                            let month = dateTime.getMonth() + 1;
+                            let day = dateTime.getDate();
+                            let hours = dateTime.getHours();
+                            let minutes = dateTime.getMinutes();
+
+                            subContent += `
+                            <div class="post-comment-list">
+                                <div class="comment-list" style="display:flex;justify-content:start;width:100%;padding:30px">
+                                    <div class="comment-image" style="width:5%;">
+                                        <a href="my-profile.html"><img style="height:50px;width:50px;" src="/images/${comment.sender.image}" class="rounded-circle" alt="image"></a>
+                                    </div>
+                                    <div class="comment-info" style="width:92%;margin-left:3%;">
+                                        <h3>
+                                            <a href="my-profile.html">${comment.sender.userName}</a>
+                                        </h3>
+                                        <span>${year}-${month}-${day} ${hours}:${minutes}</span>
+                                        <p>${comment.content}</p>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        }
+                    }
+
+                    let item = `
+                    <div class="news-feed news-feed-post" style="background-color:white;margin-top:50px;">
+                        <div class="post-header d-flex justify-content-between align-items-center" style="padding:30px;">
+                            <div class="image">
+                                <a href="#"><img src="/images/${data.posts[i].sender.image}" class="rounded-circle" style="height:150px;width:150px;" alt="image"></a>
+                            </div>
+                            <div class="info ms-3">
+                                <span class="name" style="display:block;"><a href="#" style="font-weight:bold;font-size:1.5em">${data.posts[i].sender.userName}</a></span>
+                                <span class="small-text" style="display:block;margin-top:15px;"><a href="#">${data.posts[i].shareDate}</a></span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="flaticon-menu"></i></button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-edit"></i> Edit Post</a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-private"></i> Hide Post</a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-trash"></i> Delete Post</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="post-body">
+                            <p style="font-size:1.2em;font-weight:bold;margin:30px;">${data.posts[i].text}</p>
+                            
+                            
+                            <ul class="post-meta-wrap d-flex justify-content-between align-items-center" style="padding:30px;list-style:none;">
+                                <li class="post-react" onclick="SendLike(${data.posts[i].id})">
+                                    <a href="#"><i class="flaticon-like"></i><span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
+
+                                </li>
+                                <li class="post-comment">
+                                    <a href="#"><i class="flaticon-comment"></i><span style="margin-left:5px;">Comment</span> <span style="margin-left:5px;" class="number">${data.posts[i].commentCount}</span></a>
+                                </li>
+                                <li class="post-share">
+                                    <a href="#"><i class="flaticon-share"></i><span style="margin-left:5px;">Share</span> <span style="margin-left:5px;" class="number">0</span></a>
+                                </li>
+                            </ul>
+
+                            ${subContent}
+
+                            <form class="post-footer" style="display:flex;justify-content:start;width:100%;padding:30px;">
+                                <div class="footer-image">
+                                    <a href="#"><img src="/images/${data.currentImage}" class="rounded-circle" style="width:50px;height:50px;" alt="image"></a>
+                                </div>
+                                <div class="form-group" style="display:flex;justify-content:start;width:98%;margin-left:3%">
+                                    <textarea style="width:80%%;" id="message${data.posts[i].id}" name="message" class="form-control" placeholder="Write a comment..."></textarea>
+                      
+                                    <button type="submit" style="width:15%;background-color:red;color:white;font-size:1em;margin-left:20px;" onclick="SendComment(${data.posts[i].id},event)">Send</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>`;
+                    content += item;
+                    //317 share image part
+                    //<div class="post-image">
+                    //    <img src="assets/images/news-feed-post/post-4.jpg" alt="image">
+                    //</div>
+
+                }
+
+            }
+            var posts = document.querySelector("#posts");
+            posts.style = "display:block;";
+
+            var addPost = document.querySelector("#newPost");
+            addPost.style = "display:none;";
+
+            var myPosts = document.querySelector("#myPosts");
+            myPosts.style = "display:none;";
+
+            $("#posts").html(content);
+        }
+    });
+}
+
+function AddNewPost() {
+    var newPost = document.querySelector("#newPost");
+    newPost.style = "display:block;";
+    var posts = document.querySelector("#posts");
+    posts.style = "display:none;";
+    var myPosts = document.querySelector("#myPosts");
+    myPosts.style = "display:none;";
+}
+
+function GetMyPosts() {
+    $.ajax({
+        url: "/NewsFeed/GetMyPosts",
+        method: "GET",
+        success: function (data) {
+            let content = '';
+
+            for (let i = 0; i < data.posts.length; i++) {
+
+                let subContent = '';
+
+
+
+                if (data.posts[i].comments.length != 0) {
+                    for (var j = 0; j < data.posts[i].comments.length; j++) {
+                        var comment = data.posts[i].comments[j];
+                        let dateTime = new Date(comment.writingDate);
+                        let year = dateTime.getFullYear();
+                        let month = dateTime.getMonth() + 1;
+                        let day = dateTime.getDate();
+                        let hours = dateTime.getHours();
+                        let minutes = dateTime.getMinutes();
+
+                        subContent += `
+                            <div class="post-comment-list">
+                                <div class="comment-list" style="display:flex;justify-content:start;width:100%;padding:30px">
+                                    <div class="comment-image" style="width:5%;">
+                                        <a href="my-profile.html"><img style="height:50px;width:50px;" src="/images/${comment.sender.image}" class="rounded-circle" alt="image"></a>
+                                    </div>
+                                    <div class="comment-info" style="width:92%;margin-left:3%;">
+                                        <h3>
+                                            <a href="my-profile.html">${comment.sender.userName}</a>
+                                        </h3>
+                                        <span>${year}-${month}-${day} ${hours}:${minutes}</span>
+                                        <p>${comment.content}</p>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                let item = `
+                    <div class="news-feed news-feed-post" style="background-color:white;margin-top:50px;">
+                        <div class="post-header d-flex justify-content-between align-items-center" style="padding:30px;">
+                            <div class="image">
+                                <a href="#"><img src="/images/${data.posts[i].sender.image}" class="rounded-circle" style="height:150px;width:150px;" alt="image"></a>
+                            </div>
+                            <div class="info ms-3">
+                                <span class="name" style="display:block;"><a href="#" style="font-weight:bold;font-size:1.5em">${data.posts[i].sender.userName}</a></span>
+                                <span class="small-text" style="display:block;margin-top:15px;"><a href="#">${data.posts[i].shareDate}</a></span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="flaticon-menu"></i></button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-edit"></i> Edit Post</a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-private"></i> Hide Post</a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-trash"></i> Delete Post</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="post-body">
+                            <p style="font-size:1.2em;font-weight:bold;margin:30px;">${data.posts[i].text}</p>
+                            
+                            
+                            <ul class="post-meta-wrap d-flex justify-content-between align-items-center" style="padding:30px;list-style:none;">
+                                <li class="post-react" onclick="SendLike(${data.posts[i].id})">
+                                    <a href="#"><i class="flaticon-like"></i><span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
+
+                                </li>
+                                <li class="post-comment">
+                                    <a href="#"><i class="flaticon-comment"></i><span style="margin-left:5px;">Comment</span> <span style="margin-left:5px;" class="number">${data.posts[i].commentCount}</span></a>
+                                </li>
+                                <li class="post-share">
+                                    <a href="#"><i class="flaticon-share"></i><span style="margin-left:5px;">Share</span> <span style="margin-left:5px;" class="number">0</span></a>
+                                </li>
+                            </ul>
+
+                            ${subContent}
+
+                            
+                        </div>
+                    </div>`;
+                content += item;
+                //317 share image part
+                //<div class="post-image">
+                //    <img src="assets/images/news-feed-post/post-4.jpg" alt="image">
+                //</div>
+
+
+
+            }
+            $("#myPosts").html(content);
+        }
+    });
+}
+
+function GetMyPosts2() {
+    $.ajax({
+        url: "/NewsFeed/GetMyPosts",
+        method: "GET",
+        success: function (data) {
+            let content = '';
+
+            for (let i = 0; i < data.posts.length; i++) {
+
+                let subContent = '';
+
+
+
+                if (data.posts[i].comments.length != 0) {
+                    for (var j = 0; j < data.posts[i].comments.length; j++) {
+                        var comment = data.posts[i].comments[j];
+                        let dateTime = new Date(comment.writingDate);
+                        let year = dateTime.getFullYear();
+                        let month = dateTime.getMonth() + 1;
+                        let day = dateTime.getDate();
+                        let hours = dateTime.getHours();
+                        let minutes = dateTime.getMinutes();
+
+                        subContent += `
+                            <div class="post-comment-list">
+                                <div class="comment-list" style="display:flex;justify-content:start;width:100%;padding:30px">
+                                    <div class="comment-image" style="width:5%;">
+                                        <a href="my-profile.html"><img style="height:50px;width:50px;" src="/images/${comment.sender.image}" class="rounded-circle" alt="image"></a>
+                                    </div>
+                                    <div class="comment-info" style="width:92%;margin-left:3%;">
+                                        <h3>
+                                            <a href="my-profile.html">${comment.sender.userName}</a>
+                                        </h3>
+                                        <span>${year}-${month}-${day} ${hours}:${minutes}</span>
+                                        <p>${comment.content}</p>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                let item = `
+                    <div class="news-feed news-feed-post" style="background-color:white;margin-top:50px;">
+                        <div class="post-header d-flex justify-content-between align-items-center" style="padding:30px;">
+                            <div class="image">
+                                <a href="#"><img src="/images/${data.posts[i].sender.image}" class="rounded-circle" style="height:150px;width:150px;" alt="image"></a>
+                            </div>
+                            <div class="info ms-3">
+                                <span class="name" style="display:block;"><a href="#" style="font-weight:bold;font-size:1.5em">${data.posts[i].sender.userName}</a></span>
+                                <span class="small-text" style="display:block;margin-top:15px;"><a href="#">${data.posts[i].shareDate}</a></span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="flaticon-menu"></i></button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-edit"></i> Edit Post</a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-private"></i> Hide Post</a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-trash"></i> Delete Post</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="post-body">
+                            <p style="font-size:1.2em;font-weight:bold;margin:30px;">${data.posts[i].text}</p>
+                            
+                            
+                            <ul class="post-meta-wrap d-flex justify-content-between align-items-center" style="padding:30px;list-style:none;">
+                                <li class="post-react" onclick="SendLike(${data.posts[i].id})">
+                                    <a href="#"><i class="flaticon-like"></i><span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
+
+                                </li>
+                                <li class="post-comment">
+                                    <a href="#"><i class="flaticon-comment"></i><span style="margin-left:5px;">Comment</span> <span style="margin-left:5px;" class="number">${data.posts[i].commentCount}</span></a>
+                                </li>
+                                <li class="post-share">
+                                    <a href="#"><i class="flaticon-share"></i><span style="margin-left:5px;">Share</span> <span style="margin-left:5px;" class="number">0</span></a>
+                                </li>
+                            </ul>
+
+                            ${subContent}
+
+                            
+                        </div>
+                    </div>`;
+                content += item;
+                //317 share image part
+                //<div class="post-image">
+                //    <img src="assets/images/news-feed-post/post-4.jpg" alt="image">
+                //</div>
+
+
+
+            }
+            var myPosts = document.querySelector("#myPosts");
+            myPosts.style = "display:block;";
+
+            var newPost = document.querySelector("#newPost");
+            newPost.style = "display:none;";
+
+            var allPosts = document.querySelector("#posts");
+            allPosts.style = "display:none;";
+
+            $("#myPosts").html(content);
+        }
+    });
+}
 function DeclineRequest(id, senderId) {
     window.location.href = '/Notification/Index';
 
@@ -312,6 +799,7 @@ function AcceptRequest(id, id2, requestId) {
             SendFollowCall(id2);
             GetAllUsers();
             GetMyRequests();
+            GetAllFriends();
 
             setTimeout(() => {
                 element.innerHTML = "";
@@ -326,6 +814,7 @@ function DeleteRequest(id) {
         method: "DELETE",
         success: function (data) {
             GetMyRequests();
+            //GetAllNotifications();
         }
     });
 }
@@ -338,6 +827,7 @@ function UnfollowUser(id) {
             SendFollowCall(id);
             GetAllUsers();
             GetAllFriends();
+            //GetAllNotifications();
             //window.location.href = '/Message/GoChat';
         }
     });
