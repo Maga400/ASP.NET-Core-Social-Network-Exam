@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Business.Services.Abstracts;
 using SocialNetwork.Business.Services.Concretes;
@@ -20,8 +21,9 @@ namespace SocialNetwork.WebUI.Controllers
         private readonly INotificationService _notificationService;
         private readonly IPostService _postService;
         private readonly ICommentService _commentService;
+        private readonly ILikedPostService _likedPostService;
 
-        public NewsFeedController(ILogger<HomeController> logger, UserManager<CustomIdentityUser> userManager, ICustomIdentityUserService customIdentityUserService, IFriendService friendService, IFriendRequestService friendRequestService, IChatService chatService, IMessageService messageService, SocialNetworkDbContext context, INotificationService notificationService, IPostService postService, ICommentService commentService)
+        public NewsFeedController(ILogger<HomeController> logger, UserManager<CustomIdentityUser> userManager, ICustomIdentityUserService customIdentityUserService, IFriendService friendService, IFriendRequestService friendRequestService, IChatService chatService, IMessageService messageService, SocialNetworkDbContext context, INotificationService notificationService, IPostService postService, ICommentService commentService, ILikedPostService likedPostService)
         {
             _logger = logger;
             _userManager = userManager;
@@ -34,6 +36,7 @@ namespace SocialNetwork.WebUI.Controllers
             _notificationService = notificationService;
             _postService = postService;
             _commentService = commentService;
+            _likedPostService = likedPostService;
         }
         public IActionResult Index()
         {
@@ -44,19 +47,22 @@ namespace SocialNetwork.WebUI.Controllers
         {
             var allPosts = await _postService.GetAllAsync();
             var current = await _userManager.GetUserAsync(HttpContext.User);
+            var LikedPosts = await _likedPostService.GetAllAsync();
+
             //var notifications = allNotifications.Where(r => r.ReceiverId == current.Id);
             //Task.Delay(1000);
-            return Ok(new { posts = allPosts, currentId = current.Id, currentImage = current.Image });
+            return Ok(new { posts = allPosts, currentId = current.Id, currentImage = current.Image, likedPosts = LikedPosts });
         }
 
         public async Task<IActionResult> GetMyPosts()
         {
             var allPosts = await _postService.GetAllAsync();
             var current = await _userManager.GetUserAsync(HttpContext.User);
-
+            var LikedPosts = await _likedPostService.GetAllAsync();
             var myPosts = allPosts.Where(p => p.SenderId == current.Id);
 
-            return Ok(new { posts = myPosts, currentId = current.Id, currentImage = current.Image });
+
+            return Ok(new { posts = myPosts, currentId = current.Id, currentImage = current.Image,likedPosts = LikedPosts });
         }
 
         public async Task<IActionResult> SharePost(string text = "")

@@ -25,8 +25,9 @@ namespace SocialNetwork.WebUI.Controllers
         private readonly INotificationService _notificationService;
         private readonly IPostService _postService;
         private readonly ICommentService _commentService;
+        private readonly ILikedPostService _likedPostService;
 
-        public HomeController(ILogger<HomeController> logger, UserManager<CustomIdentityUser> userManager, ICustomIdentityUserService customIdentityUserService, IFriendService friendService, IFriendRequestService friendRequestService, IChatService chatService, IMessageService messageService, SocialNetworkDbContext context, INotificationService notificationService, IPostService postService, ICommentService commentService)
+        public HomeController(ILogger<HomeController> logger, UserManager<CustomIdentityUser> userManager, ICustomIdentityUserService customIdentityUserService, IFriendService friendService, IFriendRequestService friendRequestService, IChatService chatService, IMessageService messageService, SocialNetworkDbContext context, INotificationService notificationService, IPostService postService, ICommentService commentService, ILikedPostService likedPostService)
         {
             _logger = logger;
             _userManager = userManager;
@@ -39,6 +40,7 @@ namespace SocialNetwork.WebUI.Controllers
             _notificationService = notificationService;
             _postService = postService;
             _commentService = commentService;
+            _likedPostService = likedPostService;
         }
 
         public async Task<IActionResult> Index()
@@ -174,12 +176,35 @@ namespace SocialNetwork.WebUI.Controllers
         public async Task<IActionResult> SendLike(int id)
         {
             var post = await _postService.GetByIdAsync(id);
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            var likedPosts = await _likedPostService.GetAllAsync();
             if (post != null)
             {
+                var likedPost = likedPosts.FirstOrDefault(l => l.UserId == currentUser.Id && l.PostId == post.Id);
 
-                post.LikeCount += 1;
+                if(likedPost == null) 
+                {
+                    post.LikeCount += 1;
+                    await _postService.UpdateAsync(post);
 
-                await _postService.UpdateAsync(post);
+                    var newLikedPost = new LikedPost()
+                    {
+                        PostId =post.Id,
+                        Post = post,
+                        UserId = currentUser.Id,
+                        User = currentUser
+                    };
+
+                    await _likedPostService.AddAsync(newLikedPost);
+                }
+                else
+                {
+                    post.LikeCount -= 1;
+                    await _postService.UpdateAsync(post);
+                    await _likedPostService.DeleteAsync(likedPost);
+                }
+
+                
             }
 
             return Ok();

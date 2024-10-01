@@ -327,11 +327,14 @@ function GetAllPosts() {
                 //        <button class="btn btn-warning" onclick="DeleteRequest(${data[i].id})">Delete</button>
                 //    </div>`;
                 let subContent = '';
+                let likeContent = '<i class="fa-regular fa-thumbs-up"></i>';
 
-                if (data.currentId != data.posts[i].senderId) {
+                if (data.currentId != data.posts[i].senderId)
+                {
 
                     if (data.posts[i].comments.length != 0) {
-                        for (var j = 0; j < data.posts[i].comments.length; j++) {
+                        for (var j = 0; j < data.posts[i].comments.length; j++)
+                        {
                             var comment = data.posts[i].comments[j];
                             let dateTime = new Date(comment.writingDate);
                             let year = dateTime.getFullYear();
@@ -357,6 +360,18 @@ function GetAllPosts() {
                                 </div>
                             </div>
                         `;
+                        }
+                    }
+
+                    if (data.likedPosts.length != 0) {
+
+                        for (var l = 0; l < data.likedPosts.length; l++) {
+                            if (data.likedPosts[l].userId == data.currentId && data.likedPosts[l].postId == data.posts[i].id) {
+                                likeContent = '<i class="fa-solid fa-thumbs-up"></i>';
+                                break;
+                            }
+
+                            likeContent = '<i class="fa-regular fa-thumbs-up"></i>';
                         }
                     }
 
@@ -386,7 +401,7 @@ function GetAllPosts() {
                             
                             <ul class="post-meta-wrap d-flex justify-content-between align-items-center" style="padding:30px;list-style:none;">
                                 <li class="post-react" onclick="SendLike(${data.posts[i].id})">
-                                    <a href="#"><i class="flaticon-like"></i><span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
+                                    <a href="#">${likeContent}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
 
                                 </li>
                                 <li class="post-comment">
@@ -440,10 +455,13 @@ function GetAllPosts2() {
                 //        <button class="btn btn-warning" onclick="DeleteRequest(${data[i].id})">Delete</button>
                 //    </div>`;
                 let subContent = '';
+                let likeContent = '<i class="fa-regular fa-thumbs-up"></i>';
 
-                if (data.currentId != data.posts[i].senderId) {
+                if (data.currentId != data.posts[i].senderId)
+                {
 
-                    if (data.posts[i].comments.length != 0) {
+                    if (data.posts[i].comments.length != 0)
+                    {
                         for (var j = 0; j < data.posts[i].comments.length; j++) {
                             var comment = data.posts[i].comments[j];
                             let dateTime = new Date(comment.writingDate);
@@ -473,6 +491,18 @@ function GetAllPosts2() {
                         }
                     }
 
+                    if (data.likedPosts.length != 0) {
+
+                        for (var l = 0; l < data.likedPosts.length; l++) {
+                            if (data.likedPosts[l].userId == data.currentId && data.likedPosts[l].postId == data.posts[i].id) {
+                                likeContent = '<i class="fa-solid fa-thumbs-up"></i>';
+                                break;
+                            }
+
+                            likeContent = '<i class="fa-regular fa-thumbs-up"></i>';
+                        }
+                    }
+
                     let item = `
                     <div class="news-feed news-feed-post" style="background-color:white;margin-top:50px;">
                         <div class="post-header d-flex justify-content-between align-items-center" style="padding:30px;">
@@ -499,7 +529,7 @@ function GetAllPosts2() {
                             
                             <ul class="post-meta-wrap d-flex justify-content-between align-items-center" style="padding:30px;list-style:none;">
                                 <li class="post-react" onclick="SendLike(${data.posts[i].id})">
-                                    <a href="#"><i class="flaticon-like"></i><span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
+                                    <a href="#">${likeContent}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
 
                                 </li>
                                 <li class="post-comment">
@@ -566,8 +596,7 @@ function GetMyPosts() {
             for (let i = 0; i < data.posts.length; i++) {
 
                 let subContent = '';
-
-
+                let likeContent = '<i class="fa-regular fa-thumbs-up"></i>';
 
                 if (data.posts[i].comments.length != 0) {
                     for (var j = 0; j < data.posts[i].comments.length; j++) {
@@ -599,6 +628,18 @@ function GetMyPosts() {
                     }
                 }
 
+                if (data.likedPosts.length != 0) {
+
+                    for (var l = 0; l < data.likedPosts.length; l++) {
+                        if (data.likedPosts[l].userId == data.currentId && data.likedPosts[l].postId == data.posts[i].id) {
+                            likeContent = '<i class="fa-solid fa-thumbs-up"></i>';
+                            break;
+                        }
+
+                        likeContent = '<i class="fa-regular fa-thumbs-up"></i>';
+                    }
+                }
+
                 let item = `
                     <div class="news-feed news-feed-post" style="background-color:white;margin-top:50px;">
                         <div class="post-header d-flex justify-content-between align-items-center" style="padding:30px;">
@@ -625,7 +666,7 @@ function GetMyPosts() {
                             
                             <ul class="post-meta-wrap d-flex justify-content-between align-items-center" style="padding:30px;list-style:none;">
                                 <li class="post-react" onclick="SendLike(${data.posts[i].id})">
-                                    <a href="#"><i class="flaticon-like"></i><span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
+                                    <a href="#">${likeContent}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
 
                                 </li>
                                 <li class="post-comment">
@@ -665,8 +706,7 @@ function GetMyPosts2() {
             for (let i = 0; i < data.posts.length; i++) {
 
                 let subContent = '';
-
-
+                let likeContent = '<i class="fa-regular fa-thumbs-up"></i>';
 
                 if (data.posts[i].comments.length != 0) {
                     for (var j = 0; j < data.posts[i].comments.length; j++) {
@@ -698,6 +738,19 @@ function GetMyPosts2() {
                     }
                 }
 
+                if (data.likedPosts.length != 0)
+                {
+
+                    for (var l = 0; l < data.likedPosts.length; l++) {
+                        if (data.likedPosts[l].userId == data.currentId && data.likedPosts[l].postId == data.posts[i].id) {
+                            likeContent = '<i class="fa-solid fa-thumbs-up"></i>';
+                            break;
+                        }
+
+                        likeContent = '<i class="fa-regular fa-thumbs-up"></i>';
+                    }
+                }
+
                 let item = `
                     <div class="news-feed news-feed-post" style="background-color:white;margin-top:50px;">
                         <div class="post-header d-flex justify-content-between align-items-center" style="padding:30px;">
@@ -724,7 +777,7 @@ function GetMyPosts2() {
                             
                             <ul class="post-meta-wrap d-flex justify-content-between align-items-center" style="padding:30px;list-style:none;">
                                 <li class="post-react" onclick="SendLike(${data.posts[i].id})">
-                                    <a href="#"><i class="flaticon-like"></i><span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
+                                    <a href="#">${likeContent}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
 
                                 </li>
                                 <li class="post-comment">
