@@ -2,8 +2,8 @@
 
 <div class="content-page-box-area">
 
-    <div class="row">
-        <div class="col-md-3">
+    <div>
+        <div style="width:50%">
             @foreach (var item in Model.Chats)
             {
                 var style = "";
@@ -12,10 +12,10 @@
                     style = "background-color:lightgray";
                 }
                 <a href="/Message/GoChat/@item.ReceiverId">
-                    <div style="display:flex;cursor:pointer;width:300px;border:2px solid black;
+                    <div style="display:flex;cursor:pointer;width:350px;border:2px solid black;
 margin-top:15px;padding:15px;border-radius:15px;@style">
                         <img style="width:70px;height:70px;" class="rounded-circle" alt="avatar" src="\images\@item.Receiver.Image" />
-                        <section style="margin-left:20px;">
+                        <section style="margin-left:20px;margin-right:20px;">
                             <h4>@item.Receiver.UserName</h4>
                             @if (item.Receiver.IsOnline)
                             {

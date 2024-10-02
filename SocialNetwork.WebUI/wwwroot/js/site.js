@@ -183,27 +183,16 @@ function SendFollow(id) {
 
 
 function SharePost(e) {
-    //const element = document.querySelector("#alert");
-    //element.style.display = "none";
-
     e.preventDefault();
-    let textArea = document.querySelector("#textArea").value;
-    //alert(textArea.value);
-
+    var textArea = document.querySelector("#textArea");
     $.ajax({
-        url: `/Home/SharePost?text=${textArea}`,
+        url: `/Home/SharePost?text=${textArea.value}`,
         method: "GET",
         success: function (data) {
-            //element.style.display = "block";
-            //element.innerHTML = "Your post shared successfully";
-
+            textArea.value = "";
             GetAllPosts();
             SharePostCall();
 
-            //setTimeout(() => {
-            //    element.innerHTML = "";
-            //    element.style.display = "none";
-            //}, 5000);
         }
     })
 }
@@ -255,12 +244,6 @@ function GetNotifications() {
             let content = '';
             let subContent = '';
             for (let i = 0; i < data.notifications.length; i++) {
-
-                //subContent = `
-                //    <div class="card-body">
-                //        <button class="btn btn-warning" onclick="DeleteRequest(${data[i].id})">Delete</button>
-                //    </div>`;
-
                 if (data.currentId != data.notifications[i].userId) {
                     let item = `
                     <div class="card" style="width:100%;background-color:lightgrey;margin-top:50px;">
@@ -275,9 +258,8 @@ function GetNotifications() {
                     content += item;
 
                 }
-
             }
-            $("#requests").html(content);
+            $("#notifications").html(content);
         }
     });
 }
@@ -329,139 +311,9 @@ function GetAllPosts() {
                 let subContent = '';
                 let likeContent = '<i class="fa-regular fa-thumbs-up"></i>';
 
-                if (data.currentId != data.posts[i].senderId)
-                {
+                if (data.currentId != data.posts[i].senderId) {
 
                     if (data.posts[i].comments.length != 0) {
-                        for (var j = 0; j < data.posts[i].comments.length; j++)
-                        {
-                            var comment = data.posts[i].comments[j];
-                            let dateTime = new Date(comment.writingDate);
-                            let year = dateTime.getFullYear();
-                            let month = dateTime.getMonth() + 1;
-                            let day = dateTime.getDate();
-                            let hours = dateTime.getHours();
-                            let minutes = dateTime.getMinutes();
-
-                            subContent += `
-                            <div class="post-comment-list">
-                                <div class="comment-list" style="display:flex;justify-content:start;width:100%;padding:30px">
-                                    <div class="comment-image" style="width:5%;">
-                                        <a href="my-profile.html"><img style="height:50px;width:50px;" src="/images/${comment.sender.image}" class="rounded-circle" alt="image"></a>
-                                    </div>
-                                    <div class="comment-info" style="width:92%;margin-left:3%;">
-                                        <h3>
-                                            <a href="my-profile.html">${comment.sender.userName}</a>
-                                        </h3>
-                                        <span>${year}-${month}-${day} ${hours}:${minutes}</span>
-                                        <p>${comment.content}</p>
-                                        
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        }
-                    }
-
-                    if (data.likedPosts.length != 0) {
-
-                        for (var l = 0; l < data.likedPosts.length; l++) {
-                            if (data.likedPosts[l].userId == data.currentId && data.likedPosts[l].postId == data.posts[i].id) {
-                                likeContent = '<i class="fa-solid fa-thumbs-up"></i>';
-                                break;
-                            }
-
-                            likeContent = '<i class="fa-regular fa-thumbs-up"></i>';
-                        }
-                    }
-
-                    let item = `
-                    <div class="news-feed news-feed-post" style="background-color:white;margin-top:50px;">
-                        <div class="post-header d-flex justify-content-between align-items-center" style="padding:30px;">
-                            <div class="image">
-                                <a href="#"><img src="/images/${data.posts[i].sender.image}" class="rounded-circle" style="height:150px;width:150px;" alt="image"></a>
-                            </div>
-                            <div class="info ms-3">
-                                <span class="name" style="display:block;"><a href="#" style="font-weight:bold;font-size:1.5em">${data.posts[i].sender.userName}</a></span>
-                                <span class="small-text" style="display:block;margin-top:15px;"><a href="#">${data.posts[i].shareDate}</a></span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="flaticon-menu"></i></button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-edit"></i> Edit Post</a></li>
-                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-private"></i> Hide Post</a></li>
-                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-trash"></i> Delete Post</a></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="post-body">
-                            <p style="font-size:1.2em;font-weight:bold;margin:30px;">${data.posts[i].text}</p>
-                            
-                            
-                            <ul class="post-meta-wrap d-flex justify-content-between align-items-center" style="padding:30px;list-style:none;">
-                                <li class="post-react" onclick="SendLike(${data.posts[i].id})">
-                                    <a href="#">${likeContent}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
-
-                                </li>
-                                <li class="post-comment">
-                                    <a href="#"><i class="flaticon-comment"></i><span style="margin-left:5px;">Comment</span> <span style="margin-left:5px;" class="number">${data.posts[i].commentCount}</span></a>
-                                </li>
-                                <li class="post-share">
-                                    <a href="#"><i class="flaticon-share"></i><span style="margin-left:5px;">Share</span> <span style="margin-left:5px;" class="number">0</span></a>
-                                </li>
-                            </ul>
-
-                            ${subContent}
-
-                            <form class="post-footer" style="display:flex;justify-content:start;width:100%;padding:30px;">
-                                <div class="footer-image">
-                                    <a href="#"><img src="/images/${data.currentImage}" class="rounded-circle" style="width:50px;height:50px;" alt="image"></a>
-                                </div>
-                                <div class="form-group" style="display:flex;justify-content:start;width:98%;margin-left:3%">
-                                    <textarea style="width:80%%;" id="message${data.posts[i].id}" name="message" class="form-control" placeholder="Write a comment..."></textarea>
-                      
-                                    <button type="submit" style="width:15%;background-color:red;color:white;font-size:1em;margin-left:20px;" onclick="SendComment(${data.posts[i].id},event)">Send</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>`;
-                    content += item;
-                    //317 share image part
-                    //<div class="post-image">
-                    //    <img src="assets/images/news-feed-post/post-4.jpg" alt="image">
-                    //</div>
-
-                }
-
-            }
-
-            $("#posts").html(content);
-        }
-    });
-}
-
-function GetAllPosts2() {
-    $.ajax({
-        url: "/NewsFeed/GetAllPosts",
-        method: "GET",
-        success: function (data) {
-            let content = '';
-
-            for (let i = 0; i < data.posts.length; i++) {
-
-                //subContent = `
-                //    <div class="card-body">
-                //        <button class="btn btn-warning" onclick="DeleteRequest(${data[i].id})">Delete</button>
-                //    </div>`;
-                let subContent = '';
-                let likeContent = '<i class="fa-regular fa-thumbs-up"></i>';
-
-                if (data.currentId != data.posts[i].senderId)
-                {
-
-                    if (data.posts[i].comments.length != 0)
-                    {
                         for (var j = 0; j < data.posts[i].comments.length; j++) {
                             var comment = data.posts[i].comments[j];
                             let dateTime = new Date(comment.writingDate);
@@ -529,14 +381,140 @@ function GetAllPosts2() {
                             
                             <ul class="post-meta-wrap d-flex justify-content-between align-items-center" style="padding:30px;list-style:none;">
                                 <li class="post-react" onclick="SendLike(${data.posts[i].id})">
-                                    <a href="#">${likeContent}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
+                                    <div>${likeContent}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></div>
 
                                 </li>
                                 <li class="post-comment">
-                                    <a href="#"><i class="flaticon-comment"></i><span style="margin-left:5px;">Comment</span> <span style="margin-left:5px;" class="number">${data.posts[i].commentCount}</span></a>
+                                    <div><i class="flaticon-comment"></i><span style="margin-left:5px;">Comment</span> <span style="margin-left:5px;" class="number">${data.posts[i].commentCount}</span></div>
                                 </li>
                                 <li class="post-share">
-                                    <a href="#"><i class="flaticon-share"></i><span style="margin-left:5px;">Share</span> <span style="margin-left:5px;" class="number">0</span></a>
+                                    <div><i class="flaticon-share"></i><span style="margin-left:5px;">Share</span> <span style="margin-left:5px;" class="number">0</span></div>
+                                </li>
+                            </ul>
+
+                            ${subContent}
+
+                            <form class="post-footer" style="display:flex;justify-content:start;width:100%;padding:30px;">
+                                <div class="footer-image">
+                                    <a href="#"><img src="/images/${data.currentImage}" class="rounded-circle" style="width:50px;height:50px;" alt="image"></a>
+                                </div>
+                                <div class="form-group" style="display:flex;justify-content:start;width:98%;margin-left:3%">
+                                    <textarea style="width:80%%;" id="message${data.posts[i].id}" name="message" class="form-control" placeholder="Write a comment..."></textarea>
+                      
+                                    <button type="submit" style="width:15%;background-color:red;color:white;font-size:1em;margin-left:20px;" onclick="SendComment(${data.posts[i].id},event)">Send</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>`;
+                    content += item;
+                    //317 share image part
+                    //<div class="post-image">
+                    //    <img src="assets/images/news-feed-post/post-4.jpg" alt="image">
+                    //</div>
+
+                }
+
+            }
+
+            $("#posts").html(content);
+        }
+    });
+}
+
+function GetAllPosts2() {
+    $.ajax({
+        url: "/NewsFeed/GetAllPosts",
+        method: "GET",
+        success: function (data) {
+            let content = '';
+
+            for (let i = 0; i < data.posts.length; i++) {
+
+                //subContent = `
+                //    <div class="card-body">
+                //        <button class="btn btn-warning" onclick="DeleteRequest(${data[i].id})">Delete</button>
+                //    </div>`;
+                let subContent = '';
+                let likeContent = '<i class="fa-regular fa-thumbs-up"></i>';
+
+                if (data.currentId != data.posts[i].senderId) {
+
+                    if (data.posts[i].comments.length != 0) {
+                        for (var j = 0; j < data.posts[i].comments.length; j++) {
+                            var comment = data.posts[i].comments[j];
+                            let dateTime = new Date(comment.writingDate);
+                            let year = dateTime.getFullYear();
+                            let month = dateTime.getMonth() + 1;
+                            let day = dateTime.getDate();
+                            let hours = dateTime.getHours();
+                            let minutes = dateTime.getMinutes();
+
+                            subContent += `
+                            <div class="post-comment-list">
+                                <div class="comment-list" style="display:flex;justify-content:start;width:100%;padding:30px">
+                                    <div class="comment-image" style="width:5%;">
+                                        <a href="my-profile.html"><img style="height:50px;width:50px;" src="/images/${comment.sender.image}" class="rounded-circle" alt="image"></a>
+                                    </div>
+                                    <div class="comment-info" style="width:92%;margin-left:3%;">
+                                        <h3>
+                                            <a href="my-profile.html">${comment.sender.userName}</a>
+                                        </h3>
+                                        <span>${year}-${month}-${day} ${hours}:${minutes}</span>
+                                        <p>${comment.content}</p>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        }
+                    }
+
+                    if (data.likedPosts.length != 0) {
+
+                        for (var l = 0; l < data.likedPosts.length; l++) {
+                            if (data.likedPosts[l].userId == data.currentId && data.likedPosts[l].postId == data.posts[i].id) {
+                                likeContent = '<i class="fa-solid fa-thumbs-up"></i>';
+                                break;
+                            }
+
+                            likeContent = '<i class="fa-regular fa-thumbs-up"></i>';
+                        }
+                    }
+
+                    let item = `
+                    <div class="news-feed news-feed-post" style="background-color:white;margin-top:50px;">
+                        <div class="post-header d-flex justify-content-between align-items-center" style="padding:30px;">
+                            <div class="image">
+                                <a href="#"><img src="/images/${data.posts[i].sender.image}" class="rounded-circle" style="height:150px;width:150px;" alt="image"></a>
+                            </div>
+                            <div class="info ms-3">
+                                <span class="name" style="display:block;"><a href="#" style="font-weight:bold;font-size:1.5em">${data.posts[i].sender.userName}</a></span>
+                                <span class="small-text" style="display:block;margin-top:15px;"><a href="#">${data.posts[i].shareDate}</a></span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="flaticon-menu"></i></button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-edit"></i> Edit Post</a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-private"></i> Hide Post</a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="flaticon-trash"></i> Delete Post</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="post-body">
+                            <p style="font-size:1.2em;font-weight:bold;margin:30px;">${data.posts[i].text}</p>
+                            
+                            
+                            <ul class="post-meta-wrap d-flex justify-content-between align-items-center" style="padding:30px;list-style:none;">
+                                <li class="post-react" onclick="SendLike(${data.posts[i].id})">
+                                    <div>${likeContent}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></div>
+
+                                </li>
+                                <li class="post-comment">
+                                    <div><i class="flaticon-comment"></i><span style="margin-left:5px;">Comment</span> <span style="margin-left:5px;" class="number">${data.posts[i].commentCount}</span></div>
+                                </li>
+                                <li class="post-share">
+                                    <div><i class="flaticon-share"></i><span style="margin-left:5px;">Share</span> <span style="margin-left:5px;" class="number">0</span></div>
                                 </li>
                             </ul>
 
@@ -579,7 +557,7 @@ function GetAllPosts2() {
 
 function AddNewPost() {
     var newPost = document.querySelector("#newPost");
-    newPost.style = "display:block;";
+    newPost.style = "display:block;margin-top:50px;margin-left:25%;";
     var posts = document.querySelector("#posts");
     posts.style = "display:none;";
     var myPosts = document.querySelector("#myPosts");
@@ -666,14 +644,14 @@ function GetMyPosts() {
                             
                             <ul class="post-meta-wrap d-flex justify-content-between align-items-center" style="padding:30px;list-style:none;">
                                 <li class="post-react" onclick="SendLike(${data.posts[i].id})">
-                                    <a href="#">${likeContent}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
+                                    <div>${likeContent}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></div>
 
                                 </li>
                                 <li class="post-comment">
-                                    <a href="#"><i class="flaticon-comment"></i><span style="margin-left:5px;">Comment</span> <span style="margin-left:5px;" class="number">${data.posts[i].commentCount}</span></a>
+                                    <div><i class="flaticon-comment"></i><span style="margin-left:5px;">Comment</span> <span style="margin-left:5px;" class="number">${data.posts[i].commentCount}</span></div>
                                 </li>
                                 <li class="post-share">
-                                    <a href="#"><i class="flaticon-share"></i><span style="margin-left:5px;">Share</span> <span style="margin-left:5px;" class="number">0</span></a>
+                                    <div><i class="flaticon-share"></i><span style="margin-left:5px;">Share</span> <span style="margin-left:5px;" class="number">0</span></div>
                                 </li>
                             </ul>
 
@@ -738,8 +716,7 @@ function GetMyPosts2() {
                     }
                 }
 
-                if (data.likedPosts.length != 0)
-                {
+                if (data.likedPosts.length != 0) {
 
                     for (var l = 0; l < data.likedPosts.length; l++) {
                         if (data.likedPosts[l].userId == data.currentId && data.likedPosts[l].postId == data.posts[i].id) {
@@ -777,14 +754,14 @@ function GetMyPosts2() {
                             
                             <ul class="post-meta-wrap d-flex justify-content-between align-items-center" style="padding:30px;list-style:none;">
                                 <li class="post-react" onclick="SendLike(${data.posts[i].id})">
-                                    <a href="#">${likeContent}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></a>
+                                    <div>${likeContent}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></div>
 
                                 </li>
                                 <li class="post-comment">
-                                    <a href="#"><i class="flaticon-comment"></i><span style="margin-left:5px;">Comment</span> <span style="margin-left:5px;" class="number">${data.posts[i].commentCount}</span></a>
+                                    <div><i class="flaticon-comment"></i><span style="margin-left:5px;">Comment</span> <span style="margin-left:5px;" class="number">${data.posts[i].commentCount}</span></div>
                                 </li>
                                 <li class="post-share">
-                                    <a href="#"><i class="flaticon-share"></i><span style="margin-left:5px;">Share</span> <span style="margin-left:5px;" class="number">0</span></a>
+                                    <div><i class="flaticon-share"></i><span style="margin-left:5px;">Share</span> <span style="margin-left:5px;" class="number">0</span></div>
                                 </li>
                             </ul>
 
@@ -816,14 +793,13 @@ function GetMyPosts2() {
     });
 }
 function DeclineRequest(id, senderId) {
-    window.location.href = '/Notification/Index';
+    //window.location.href = '/Notification/Index';
 
     $.ajax({
         url: `/Home/DeclineRequest?id=${id}&senderId=${senderId}`,
         method: "GET",
         success: function (data) {
-            const element = document.querySelector("#alert");
-            element.style.display = "block";
+
             element.innerHTML = "You declined request";
 
             SendFollowCall(senderId);
@@ -839,25 +815,17 @@ function DeclineRequest(id, senderId) {
 }
 
 function AcceptRequest(id, id2, requestId) {
-    window.location.href = '/Notification/Index';
+    //window.location.href = '/Notification/Index';
     $.ajax({
         url: `/Home/AcceptRequest?userId=${id}&senderId=${id2}&requestId=${requestId}`,
         method: "GET",
         success: function (data) {
-            const element = document.querySelector("#alert");
-            element.style.display = "block";
-            element.innerHTML = "You accept request successfully";
 
             SendFollowCall(id);
             SendFollowCall(id2);
-            GetAllUsers();
-            GetMyRequests();
-            GetAllFriends();
-
-            setTimeout(() => {
-                element.innerHTML = "";
-                element.style.display = "none";
-            }, 5000);
+            //GetAllUsers();
+            //GetMyRequests();
+            //GetAllFriends();
         }
     });
 }
@@ -878,10 +846,11 @@ function UnfollowUser(id) {
         method: "DELETE",
         success: function (data) {
             SendFollowCall(id);
+            UnFollowUserCall(id);
             GetAllUsers();
             GetAllFriends();
-            //GetAllNotifications();
             //window.location.href = '/Message/GoChat';
+            //GetAllNotifications();
         }
     });
 }

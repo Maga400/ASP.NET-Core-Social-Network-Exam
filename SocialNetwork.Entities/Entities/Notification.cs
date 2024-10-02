@@ -13,7 +13,7 @@ namespace SocialNetwork.Entities.Entities
         public string? Status { get; set; }
         public string? UserId { get; set; }
         public virtual CustomIdentityUser? User { get; set; }
-
+        public DateTime? Date {  get; set; }
 
     }
 }

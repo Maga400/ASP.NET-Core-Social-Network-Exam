@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -218,7 +218,9 @@ namespace SocialNetwork.WebUI.Controllers
                 Content = $"{sender.UserName} share a new post at {DateTime.Now.ToLongDateString()}",
                 UserId = sender.Id,
                 User = sender,
-                Status = "Notification"
+                Status = "Notification",
+                Date = DateTime.Now,
+                
             };
 
             var post = new Post
@@ -265,9 +267,37 @@ namespace SocialNetwork.WebUI.Controllers
         {
             var allNotifications = await _notificationService.GetAllAsync();
             var current = await _userManager.GetUserAsync(HttpContext.User);
+            var allFriends = await _friendService.GetAllAsync();
+            var friendNotifications = allNotifications.Where(n => allFriends.All(f => f.OwnId == n.UserId)).ToList();
+
+            var friends = allFriends
+            .Where(f => f.OwnId == current.Id || f.YourFriendId == current.Id)
+            .ToList();
+
+            // Arkadaşlara ait olan bildirimleri getir
+            var notifications = allNotifications
+            .Where(n =>
+                friends.Any(f =>
+                    (f.OwnId == current.Id && n.UserId == f.YourFriendId && n.Date > f.FriendDate) ||
+                    (f.YourFriendId == current.Id && n.UserId == f.OwnId && n.Date > f.FriendDate)
+                )
+            )
+            .ToList();
+            //var friendUsers = datas
+            //.Where(u => myFriends.Any(f => f.OwnId == u.Id || f.YourFriendId == u.Id) && u.Id != user.Id)
+            //.Select(u => new CustomIdentityUser
+            //{
+            //    Id = u.Id,
+            //    IsOnline = u.IsOnline,
+            //    UserName = u.UserName,
+            //    Image = u.Image,
+            //    Email = u.Email
+            //})
+            //.ToList();
             //var notifications = allNotifications.Where(r => r.ReceiverId == current.Id);
             //Task.Delay(1000);
-            return Ok(new { notifications = allNotifications, currentId = current.Id });
+
+            return Ok(new { notifications = notifications, currentId = current.Id });
         }
 
         //public async Task<IActionResult> GetAllPosts()
@@ -334,6 +364,7 @@ namespace SocialNetwork.WebUI.Controllers
                 {
                     OwnId = sender.Id,
                     YourFriendId = receiverUser.Id,
+                    FriendDate = DateTime.Now,
                 });
 
                 await _userManager.UpdateAsync(receiverUser);

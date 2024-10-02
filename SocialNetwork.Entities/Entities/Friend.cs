@@ -12,7 +12,7 @@ namespace SocialNetwork.Entities.Entities
         public string? OwnId { get; set; }
         public string? YourFriendId { get; set; }
         public virtual CustomIdentityUser? YourFriend { get; set; }
-        
+        public DateTime? FriendDate {  get; set; } 
     
     }
 }
