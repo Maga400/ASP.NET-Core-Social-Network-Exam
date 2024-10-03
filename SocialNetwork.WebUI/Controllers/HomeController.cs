@@ -26,8 +26,9 @@ namespace SocialNetwork.WebUI.Controllers
         private readonly IPostService _postService;
         private readonly ICommentService _commentService;
         private readonly ILikedPostService _likedPostService;
+        private readonly ILikedCommentService _likedCommentService;
 
-        public HomeController(ILogger<HomeController> logger, UserManager<CustomIdentityUser> userManager, ICustomIdentityUserService customIdentityUserService, IFriendService friendService, IFriendRequestService friendRequestService, IChatService chatService, IMessageService messageService, SocialNetworkDbContext context, INotificationService notificationService, IPostService postService, ICommentService commentService, ILikedPostService likedPostService)
+        public HomeController(ILogger<HomeController> logger, UserManager<CustomIdentityUser> userManager, ICustomIdentityUserService customIdentityUserService, IFriendService friendService, IFriendRequestService friendRequestService, IChatService chatService, IMessageService messageService, SocialNetworkDbContext context, INotificationService notificationService, IPostService postService, ICommentService commentService, ILikedPostService likedPostService, ILikedCommentService likedCommentService)
         {
             _logger = logger;
             _userManager = userManager;
@@ -41,6 +42,7 @@ namespace SocialNetwork.WebUI.Controllers
             _postService = postService;
             _commentService = commentService;
             _likedPostService = likedPostService;
+            _likedCommentService = likedCommentService;
         }
 
         public async Task<IActionResult> Index()
@@ -172,7 +174,6 @@ namespace SocialNetwork.WebUI.Controllers
 
             return Ok();
         }
-
         public async Task<IActionResult> SendLike(int id)
         {
             var post = await _postService.GetByIdAsync(id);
@@ -205,6 +206,43 @@ namespace SocialNetwork.WebUI.Controllers
                 }
 
                 
+            }
+
+            return Ok();
+        }
+
+        public async Task<IActionResult> SendCommentLike(int id)
+        {
+            var comment = await _commentService.GetByIdAsync(id);
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            var likedComments = await _likedCommentService.GetAllAsync();
+            if (comment != null)
+            {
+                var likedComment = likedComments.FirstOrDefault(l => l.UserId == currentUser.Id && l.CommentId == comment.Id);
+
+                if (likedComment == null)
+                {
+                    comment.LikeCount += 1;
+                    await _commentService.UpdateAsync(comment);
+
+                    var newLikedComment = new LikedComment()
+                    {
+                        CommentId = comment.Id,
+                        Comment = comment,
+                        UserId = currentUser.Id,
+                        User = currentUser
+                    };
+
+                    await _likedCommentService.AddAsync(newLikedComment);
+                }
+                else
+                {
+                    comment.LikeCount -= 1;
+                    await _commentService.UpdateAsync(comment);
+                    await _likedCommentService.DeleteAsync(likedComment);
+                }
+
+
             }
 
             return Ok();

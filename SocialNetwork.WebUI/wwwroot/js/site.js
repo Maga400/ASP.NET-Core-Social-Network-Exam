@@ -295,6 +295,20 @@ function SendLike(id) {
     });
 }
 
+function SendCommentLike(id) {
+
+    $.ajax({
+        url: `/Home/SendCommentLike/${id}`,
+        method: "GET",
+        success: function (data) {
+            //SharePostCall();
+            GetAllPosts();
+            GetMyPosts();
+            GetAllPostsCall();
+        }
+    });
+}
+
 function GetAllPosts() {
     $.ajax({
         url: "/NewsFeed/GetAllPosts",
@@ -311,10 +325,12 @@ function GetAllPosts() {
                 let subContent = '';
                 let likeContent = '<i class="fa-regular fa-thumbs-up"></i>';
 
+
                 if (data.currentId != data.posts[i].senderId) {
 
                     if (data.posts[i].comments.length != 0) {
                         for (var j = 0; j < data.posts[i].comments.length; j++) {
+                            let likeContent2 = '<i class="fa-regular fa-thumbs-up"></i>';
                             var comment = data.posts[i].comments[j];
                             let dateTime = new Date(comment.writingDate);
                             let year = dateTime.getFullYear();
@@ -323,19 +339,35 @@ function GetAllPosts() {
                             let hours = dateTime.getHours();
                             let minutes = dateTime.getMinutes();
 
+                            if (data.likedComments.length != 0) {
+
+                                for (var n = 0; n < data.likedComments.length; n++) {
+                                    if (data.likedComments[n].userId == data.currentId && data.likedComments[n].commentId == comment.id) {
+                                        likeContent2 = '<i class="fa-solid fa-thumbs-up"></i>';
+                                        break;
+                                    }
+
+                                    likeContent2 = '<i class="fa-regular fa-thumbs-up"></i>';
+                                }
+                            }
+
                             subContent += `
                             <div class="post-comment-list">
                                 <div class="comment-list" style="display:flex;justify-content:start;width:100%;padding:30px">
                                     <div class="comment-image" style="width:5%;">
                                         <a href="my-profile.html"><img style="height:50px;width:50px;" src="/images/${comment.sender.image}" class="rounded-circle" alt="image"></a>
                                     </div>
-                                    <div class="comment-info" style="width:92%;margin-left:3%;">
+                                    <div class="comment-info" style="width:85%;margin-left:3%;">
                                         <h3>
                                             <a href="my-profile.html">${comment.sender.userName}</a>
                                         </h3>
                                         <span>${year}-${month}-${day} ${hours}:${minutes}</span>
                                         <p>${comment.content}</p>
                                         
+                                    </div>
+                                    <div class="post-react" onclick="SendCommentLike(${comment.id})">
+                                        <div>${likeContent2}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${comment.likeCount}</span></div>
+
                                     </div>
                                 </div>
                             </div>
@@ -354,6 +386,8 @@ function GetAllPosts() {
                             likeContent = '<i class="fa-regular fa-thumbs-up"></i>';
                         }
                     }
+
+
 
                     let item = `
                     <div class="news-feed news-feed-post" style="background-color:white;margin-top:50px;">
@@ -441,6 +475,7 @@ function GetAllPosts2() {
 
                     if (data.posts[i].comments.length != 0) {
                         for (var j = 0; j < data.posts[i].comments.length; j++) {
+                            let likeContent2 = '<i class="fa-regular fa-thumbs-up"></i>';
                             var comment = data.posts[i].comments[j];
                             let dateTime = new Date(comment.writingDate);
                             let year = dateTime.getFullYear();
@@ -449,19 +484,35 @@ function GetAllPosts2() {
                             let hours = dateTime.getHours();
                             let minutes = dateTime.getMinutes();
 
+                            if (data.likedComments.length != 0) {
+
+                                for (var l = 0; l < data.likedComments.length; l++) {
+                                    if (data.likedComments[l].userId == data.currentId && data.likedComments[l].commentId == comment.id) {
+                                        likeContent2 = '<i class="fa-solid fa-thumbs-up"></i>';
+                                        break;
+                                    }
+
+                                    likeContent2 = '<i class="fa-regular fa-thumbs-up"></i>';
+                                }
+                            }
+
                             subContent += `
                             <div class="post-comment-list">
                                 <div class="comment-list" style="display:flex;justify-content:start;width:100%;padding:30px">
                                     <div class="comment-image" style="width:5%;">
                                         <a href="my-profile.html"><img style="height:50px;width:50px;" src="/images/${comment.sender.image}" class="rounded-circle" alt="image"></a>
                                     </div>
-                                    <div class="comment-info" style="width:92%;margin-left:3%;">
+                                    <div class="comment-info" style="width:85%;margin-left:3%;">
                                         <h3>
                                             <a href="my-profile.html">${comment.sender.userName}</a>
                                         </h3>
                                         <span>${year}-${month}-${day} ${hours}:${minutes}</span>
                                         <p>${comment.content}</p>
                                         
+                                    </div>
+                                    <div class="post-react" onclick="SendCommentLike(${comment.id})">
+                                        <div>${likeContent2}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${comment.likeCount}</span></div>
+
                                     </div>
                                 </div>
                             </div>
@@ -578,6 +629,7 @@ function GetMyPosts() {
 
                 if (data.posts[i].comments.length != 0) {
                     for (var j = 0; j < data.posts[i].comments.length; j++) {
+                        let likeContent2 = '<i class="fa-regular fa-thumbs-up"></i>';
                         var comment = data.posts[i].comments[j];
                         let dateTime = new Date(comment.writingDate);
                         let year = dateTime.getFullYear();
@@ -586,19 +638,35 @@ function GetMyPosts() {
                         let hours = dateTime.getHours();
                         let minutes = dateTime.getMinutes();
 
+                        if (data.likedComments.length != 0) {
+
+                            for (var l = 0; l < data.likedComments.length; l++) {
+                                if (data.likedComments[l].userId == data.currentId && data.likedComments[l].commentId == comment.id) {
+                                    likeContent2 = '<i class="fa-solid fa-thumbs-up"></i>';
+                                    break;
+                                }
+
+                                likeContent2 = '<i class="fa-regular fa-thumbs-up"></i>';
+                            }
+                        }
+
                         subContent += `
                             <div class="post-comment-list">
                                 <div class="comment-list" style="display:flex;justify-content:start;width:100%;padding:30px">
                                     <div class="comment-image" style="width:5%;">
                                         <a href="my-profile.html"><img style="height:50px;width:50px;" src="/images/${comment.sender.image}" class="rounded-circle" alt="image"></a>
                                     </div>
-                                    <div class="comment-info" style="width:92%;margin-left:3%;">
+                                    <div class="comment-info" style="width:85%;margin-left:3%;">
                                         <h3>
                                             <a href="my-profile.html">${comment.sender.userName}</a>
                                         </h3>
                                         <span>${year}-${month}-${day} ${hours}:${minutes}</span>
                                         <p>${comment.content}</p>
                                         
+                                    </div>
+                                    <div class="post-react" onclick="SendCommentLike(${comment.id})">
+                                        <div>${likeContent2}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${comment.likeCount}</span></div>
+
                                     </div>
                                 </div>
                             </div>
@@ -688,6 +756,7 @@ function GetMyPosts2() {
 
                 if (data.posts[i].comments.length != 0) {
                     for (var j = 0; j < data.posts[i].comments.length; j++) {
+                        let likeContent2 = '<i class="fa-regular fa-thumbs-up"></i>';
                         var comment = data.posts[i].comments[j];
                         let dateTime = new Date(comment.writingDate);
                         let year = dateTime.getFullYear();
@@ -696,19 +765,35 @@ function GetMyPosts2() {
                         let hours = dateTime.getHours();
                         let minutes = dateTime.getMinutes();
 
+                        if (data.likedComments.length != 0) {
+
+                            for (var l = 0; l < data.likedComments.length; l++) {
+                                if (data.likedComments[l].userId == data.currentId && data.likedComments[l].commentId == comment.id) {
+                                    likeContent2 = '<i class="fa-solid fa-thumbs-up"></i>';
+                                    break;
+                                }
+
+                                likeContent2 = '<i class="fa-regular fa-thumbs-up"></i>';
+                            }
+                        }
+
                         subContent += `
                             <div class="post-comment-list">
                                 <div class="comment-list" style="display:flex;justify-content:start;width:100%;padding:30px">
                                     <div class="comment-image" style="width:5%;">
                                         <a href="my-profile.html"><img style="height:50px;width:50px;" src="/images/${comment.sender.image}" class="rounded-circle" alt="image"></a>
                                     </div>
-                                    <div class="comment-info" style="width:92%;margin-left:3%;">
+                                    <div class="comment-info" style="width:85%;margin-left:3%;">
                                         <h3>
                                             <a href="my-profile.html">${comment.sender.userName}</a>
                                         </h3>
                                         <span>${year}-${month}-${day} ${hours}:${minutes}</span>
                                         <p>${comment.content}</p>
                                         
+                                    </div>
+                                    <div class="post-react" onclick="SendCommentLike(${comment.id})">
+                                        <div>${likeContent2}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${comment.likeCount}</span></div>
+
                                     </div>
                                 </div>
                             </div>

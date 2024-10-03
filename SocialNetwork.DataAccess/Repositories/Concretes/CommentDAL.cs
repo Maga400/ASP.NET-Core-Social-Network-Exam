@@ -32,14 +32,14 @@ namespace SocialNetwork.DataAccess.Repositories.Concretes
 
         public async Task<List<Comment>> GetAllAsync()
         {
-            var chats = await _context.Comments.Include(nameof(Comment.Sender)).Include(nameof(Comment.Post)).ToListAsync();
-            return chats;
+            var comments = await _context.Comments.Include(nameof(Comment.Sender)).Include(nameof(Comment.Post)).ToListAsync();
+            return comments;
         }
 
         public async Task<Comment> GetByIdAsync(int id)
         {
-            var chat = await _context.Comments.Include(nameof(Comment.Sender)).Include(nameof(Comment.Post)).FirstOrDefaultAsync(x => x.Id == id);
-            return chat;
+            var comment = await _context.Comments.Include(nameof(Comment.Sender)).Include(nameof(Comment.Post)).FirstOrDefaultAsync(x => x.Id == id);
+            return comment;
         }
 
         public async Task UpdateAsync(Comment comment)

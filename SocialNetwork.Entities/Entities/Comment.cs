@@ -14,6 +14,7 @@ namespace SocialNetwork.Entities.Entities
         public int PostId { get; set; }
         public Post? Post { get; set; }
         public string? SenderId { get; set; }
+        public int LikeCount { get; set; } = 0;
         public CustomIdentityUser? Sender { get; set; }
     }
 }
