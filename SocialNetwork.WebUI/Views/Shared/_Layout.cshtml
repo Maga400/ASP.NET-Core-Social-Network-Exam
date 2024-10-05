@@ -439,13 +439,16 @@
                             </div>
                             <div class="option-item">
                                 <div class="dropdown profile-nav-item">
-                                    <a href="#" class="dropdown-bs-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    @await Component.InvokeAsync("CurrentUser")
+
+                                    @* <a href="#" class="dropdown-bs-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <div class="menu-profile">
-                                            <img src="/images/user-1.jpg" class="rounded-circle" alt="image">
+                                            @* //-------------------------------------------------------------------------------------------------------------------------- *@
+                                            @* <img src="/images/user-1.jpg" class="rounded-circle" alt="image">
                                             <span class="name">Matthew</span>
                                             <span class="status-online"></span>
-                                        </div>
-                                    </a>
+                                        </div> *@
+                                    @* </a> *@
 
                                     <div class="dropdown-menu">
                                         <div class="profile-header">
