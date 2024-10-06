@@ -96,6 +96,8 @@ function SendMessage(receiverId, senderId) {
         success: function (data) {
             GetMessageCall(receiverId, senderId);
             content.value = "";
+            var audio = document.querySelector("#mySound");
+            audio.play();
         }
     })
 }
