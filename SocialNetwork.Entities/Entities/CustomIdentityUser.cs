@@ -16,7 +16,8 @@ namespace SocialNetwork.Entities.Entities
         public virtual ICollection<FriendRequest>? FriendRequests { get; set; }
         public virtual ICollection<Notification>? Notifications { get; set; }
         public virtual ICollection<Chat>? Chats { get; set; }
-        public virtual ICollection<Post> Posts { get; set; }
+        public virtual ICollection<Post>? Posts { get; set; }
+        public virtual ICollection<MyNotification>? MyNotifications { get; set; }
         public CustomIdentityUser()
         {
             Friends = new List<Friend>();
@@ -24,6 +25,7 @@ namespace SocialNetwork.Entities.Entities
             Chats = new List<Chat>();
             Notifications = new List<Notification>();
             Posts = new List<Post>();
+            MyNotifications = new List<MyNotification>();
         }
 
     }

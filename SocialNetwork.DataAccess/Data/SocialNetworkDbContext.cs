@@ -22,6 +22,7 @@ namespace SocialNetwork.DataAccess.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<LikedPost> LikedPosts { get;set; }
         public DbSet<LikedComment> LikedComments { get; set; }
+        public DbSet<MyNotification> MyNotifications { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=SocialDB;Integrated Security=True;", b => b.MigrationsAssembly("SocialNetwork.WebUI"));

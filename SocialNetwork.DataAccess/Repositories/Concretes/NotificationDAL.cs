@@ -32,14 +32,14 @@ namespace SocialNetwork.DataAccess.Repositories.Concretes
 
         public async Task<List<Notification>> GetAllAsync()
         {
-            var chats = await _context.Notifications.ToListAsync();
-            return chats;
+            var notifications = await _context.Notifications.ToListAsync();
+            return notifications;
         }
 
         public async Task<Notification> GetByIdAsync(int id)
         {
-            var chat = await _context.Notifications.FirstOrDefaultAsync(x => x.Id == id);
-            return chat;
+            var notification = await _context.Notifications.FirstOrDefaultAsync(x => x.Id == id);
+            return notification;
         }
 
         public async Task UpdateAsync(Notification notification)

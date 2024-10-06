@@ -55,6 +55,7 @@ function GetAllUsers() {
 GetAllUsers();
 GetMyRequests();
 GetNotifications();
+GetMyNotifications();
 function GetMessages(receiverId, senderId) {
     $.ajax({
         url: `/Message/GetAllMessages?receiverId=${receiverId}&senderId=${senderId}`,
@@ -236,6 +237,38 @@ function GetMyRequests() {
         }
     });
 }
+
+function GetMyNotifications() {
+    $.ajax({
+        url: "/Home/GetMyNotifications",
+        method: "GET",
+        success: function (data) {
+            let content = '';
+            let subContent = '';
+            for (let i = 0; i < data.length; i++) {
+
+                subContent = `
+                    <div class="card-body">
+                        <button class="btn btn-warning" onclick="DeleteNotification(${data[i].id})">Delete</button>
+                    </div>`;
+
+                let item = `
+                <div class="card" style="width:100%;background-color:lightgrey;margin-top:50px;">
+                    <div class="card-body">
+                        <h5 style="color:red;">${data[i].status}</h5>
+                        <ul class="list-group list-group-flush">
+                            <li style="font-size:1em;list-style:none;">${data[i].content}</li>
+                        </ul>
+                        ${subContent}
+                    </div>
+                </div>`;
+
+                content += item;
+            }
+            $("#myNotifications").html(content);
+        }
+    });
+}
 function GetNotifications() {
     $.ajax({
         url: "/Home/GetAllNotification",
@@ -264,16 +297,17 @@ function GetNotifications() {
     });
 }
 
-function SendComment(id, e) {
+function SendComment(id, e,senderId) {
     e.preventDefault();
 
     let textArea = document.querySelector(`#message${id}`).value;
 
     $.ajax({
-        url: `/Home/SendComment?id=${id}&message=${textArea}`,
+        url: `/Home/SendComment?id=${id}&message=${textArea}&senderId=${senderId}`,
         method: "GET",
         success: function (data) {
             //SharePostCall();
+            SendNotificationCall(senderId);
             GetAllPosts();
             GetMyPosts();
             GetAllPostsCall();
@@ -281,13 +315,14 @@ function SendComment(id, e) {
     });
 }
 
-function SendLike(id) {
+function SendLike(id,senderId) {
 
     $.ajax({
-        url: `/Home/SendLike/${id}`,
+        url: `/Home/SendLike?id=${id}&currentId=${senderId}`,
         method: "GET",
         success: function (data) {
             //SharePostCall();
+            SendNotificationCall(senderId);
             GetAllPosts();
             GetMyPosts();
             GetAllPostsCall();
@@ -295,13 +330,14 @@ function SendLike(id) {
     });
 }
 
-function SendCommentLike(id) {
+function SendCommentLike(id,senderId) {
 
     $.ajax({
-        url: `/Home/SendCommentLike/${id}`,
+        url: `/Home/SendCommentLike?id=${id}&senderId=${senderId}`,
         method: "GET",
         success: function (data) {
             //SharePostCall();
+            SendNotificationCall(senderId);
             GetAllPosts();
             GetMyPosts();
             GetAllPostsCall();
@@ -365,7 +401,7 @@ function GetAllPosts() {
                                         <p>${comment.content}</p>
                                         
                                     </div>
-                                    <div class="post-react" onclick="SendCommentLike(${comment.id})">
+                                    <div class="post-react" onclick="SendCommentLike(${comment.id},'${comment.senderId}')">
                                         <div>${likeContent2}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${comment.likeCount}</span></div>
 
                                     </div>
@@ -414,7 +450,7 @@ function GetAllPosts() {
                             
                             
                             <ul class="post-meta-wrap d-flex justify-content-between align-items-center" style="padding:30px;list-style:none;">
-                                <li class="post-react" onclick="SendLike(${data.posts[i].id})">
+                                <li class="post-react" onclick="SendLike(${data.posts[i].id},'${data.posts[i].senderId}')">
                                     <div>${likeContent}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></div>
 
                                 </li>
@@ -435,7 +471,7 @@ function GetAllPosts() {
                                 <div class="form-group" style="display:flex;justify-content:start;width:98%;margin-left:3%">
                                     <textarea style="width:80%%;" id="message${data.posts[i].id}" name="message" class="form-control" placeholder="Write a comment..."></textarea>
                       
-                                    <button type="submit" style="width:15%;background-color:red;color:white;font-size:1em;margin-left:20px;" onclick="SendComment(${data.posts[i].id},event)">Send</button>
+                                    <button type="submit" style="width:15%;background-color:red;color:white;font-size:1em;margin-left:20px;" onclick="SendComment(${data.posts[i].id},event,'${data.posts[i].senderId}')">Send</button>
                                 </div>
                             </form>
                         </div>
@@ -510,7 +546,7 @@ function GetAllPosts2() {
                                         <p>${comment.content}</p>
                                         
                                     </div>
-                                    <div class="post-react" onclick="SendCommentLike(${comment.id})">
+                                    <div class="post-react" onclick="SendCommentLike(${comment.id},'${comment.senderId}')">
                                         <div>${likeContent2}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${comment.likeCount}</span></div>
 
                                     </div>
@@ -557,7 +593,7 @@ function GetAllPosts2() {
                             
                             
                             <ul class="post-meta-wrap d-flex justify-content-between align-items-center" style="padding:30px;list-style:none;">
-                                <li class="post-react" onclick="SendLike(${data.posts[i].id})">
+                                <li class="post-react" onclick="SendLike(${data.posts[i].id},'${data.posts[i].senderId}')">
                                     <div>${likeContent}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${data.posts[i].likeCount}</span></div>
 
                                 </li>
@@ -578,7 +614,7 @@ function GetAllPosts2() {
                                 <div class="form-group" style="display:flex;justify-content:start;width:98%;margin-left:3%">
                                     <textarea style="width:80%%;" id="message${data.posts[i].id}" name="message" class="form-control" placeholder="Write a comment..."></textarea>
                       
-                                    <button type="submit" style="width:15%;background-color:red;color:white;font-size:1em;margin-left:20px;" onclick="SendComment(${data.posts[i].id},event)">Send</button>
+                                    <button type="submit" style="width:15%;background-color:red;color:white;font-size:1em;margin-left:20px;" onclick="SendComment(${data.posts[i].id},event,'${data.posts[i].senderId}')">Send</button>
                                 </div>
                             </form>
                         </div>
@@ -664,7 +700,7 @@ function GetMyPosts() {
                                         <p>${comment.content}</p>
                                         
                                     </div>
-                                    <div class="post-react" onclick="SendCommentLike(${comment.id})">
+                                    <div class="post-react" onclick="SendCommentLike(${comment.id},'${comment.senderId}')">
                                         <div>${likeContent2}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${comment.likeCount}</span></div>
 
                                     </div>
@@ -791,7 +827,7 @@ function GetMyPosts2() {
                                         <p>${comment.content}</p>
                                         
                                     </div>
-                                    <div class="post-react" onclick="SendCommentLike(${comment.id})">
+                                    <div class="post-react" onclick="SendCommentLike(${comment.id},'${comment.senderId}')">
                                         <div>${likeContent2}<span style="margin-left:5px;">Like</span> <span style="margin-left:5px;" class="number">${comment.likeCount}</span></div>
 
                                     </div>
@@ -920,6 +956,17 @@ function DeleteRequest(id) {
         method: "DELETE",
         success: function (data) {
             GetMyRequests();
+            //GetAllNotifications();
+        }
+    });
+}
+
+function DeleteNotification(id) {
+    $.ajax({
+        url: `/Home/DeleteNotification/${id}`,
+        method: "DELETE",
+        success: function (data) {
+            GetMyNotifications();
             //GetAllNotifications();
         }
     });

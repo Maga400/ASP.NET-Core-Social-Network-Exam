@@ -47,6 +47,11 @@ namespace SocialNetwork.WebUI.Hubs
             await Clients.User(id).SendAsync("ReceiveNotification");
         }
 
+        public async Task SendNotification(string currentId)
+        {
+            await Clients.User(currentId).SendAsync("ReceiveMyNotification");
+        }
+
         public async Task UnFollow(string id)
         {
             await Clients.User(id).SendAsync("ReceiveUnFollowNotification");

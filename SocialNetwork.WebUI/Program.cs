@@ -23,26 +23,39 @@ builder.Services.AddControllersWithViews()
     });
 
 builder.Services.AddScoped<IImageService,ImageService>();
+
 builder.Services.AddScoped<ICustomIdentityUserDAL, CustomIdentityUserDAL>();
 builder.Services.AddScoped<ICustomIdentityUserService, CustomIdentityUserService>();
+
 builder.Services.AddScoped<IFriendDAL, FriendDAL>();
 builder.Services.AddScoped<IFriendService, FriendService>();
+
 builder.Services.AddScoped<IFriendRequestDAL, FriendRequestDAL>();
 builder.Services.AddScoped<IFriendRequestService, FriendRequestService>();
+
 builder.Services.AddScoped<IChatDAL, ChatDAL>();
 builder.Services.AddScoped<IChatService, ChatService>();
+
 builder.Services.AddScoped<IMessageDAL, MessageDAL>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+
 builder.Services.AddScoped<INotificationDAL, NotificationDAL>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+
 builder.Services.AddScoped<ICommentDAL, CommentDAL>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+
 builder.Services.AddScoped<IPostDAL, PostDAL>();
 builder.Services.AddScoped<IPostService, PostService>();
+
 builder.Services.AddScoped<ILikedPostDAL, LikedPostDAL>();
 builder.Services.AddScoped<ILikedPostService, LikedPostService>();
+
 builder.Services.AddScoped<ILikedCommentDAL, LikedCommentDAL>();
 builder.Services.AddScoped<ILikedCommentService,LikedCommentService>();
+
+builder.Services.AddScoped<IMyNotificationDAL, MyNotificationDAL>();
+builder.Services.AddScoped<IMyNotificationService, MyNotificationService>();
 
 var connection = builder.Configuration.GetConnectionString("Default");
 

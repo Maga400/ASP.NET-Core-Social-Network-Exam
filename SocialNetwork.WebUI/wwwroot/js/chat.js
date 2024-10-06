@@ -47,6 +47,9 @@ async function GetMessageCall(receiverId, senderId) {
 async function SendFollowCall(id) {
     await connection.invoke("SendFollow",id);
 }
+async function SendNotificationCall(currentId) {
+    await connection.invoke("SendNotification",currentId);
+}
 async function UnFollowUserCall(id) {
     await connection.invoke("UnFollow", id);
 }
@@ -79,4 +82,8 @@ connection.on("ReceiveNotification", function () {
     GetAllFriends();
     //window.location.href = '/Message/GoChat';
 
+})
+
+connection.on("ReceiveMyNotification", function () {
+    GetMyNotifications();
 })
