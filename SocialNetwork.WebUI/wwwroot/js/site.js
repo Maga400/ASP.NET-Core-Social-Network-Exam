@@ -66,13 +66,26 @@ function GetMessages(receiverId, senderId) {
                 let dateTime = new Date(data.messages[i].dateTime);
                 let hour = dateTime.getHours();
                 let minute = dateTime.getMinutes();
-                let item = `<section style="display:flex;margin-top:25px;border:2px solid black;
-margin-left:10px;border-radius:10px;background-color:lightgrey;min-width:20%;max-width:90%;">
+                let item = '';
+                if (data.messages[i].receiverId == data.currentUserId) {
+                    item = `<section style="display:flex;margin-top:25px;border:2px solid black;
+    margin-left:10px;border-radius:10px;background-color:lightgrey;min-width:20%;max-width:50%;">
 
-                                        <h5 style="margin-left:10px;margin-top:15px;margin-right:10px;font-size:1em;">${data.messages[i].content}</h5>
-                                        <p style="margin-top:20px;margin-right:10px;font-size:0.9em">${hour}:${minute}</p>
+                                            <h5 style="margin-left:10px;margin-top:15px;margin-right:10px;font-size:1em;">${data.messages[i].content}</h5>
+                                            <p style="margin-top:20px;margin-right:10px;font-size:0.9em">${hour}:${minute}</p>
                                         
-                                    </section>`;
+                                        </section>`;
+
+                }
+                else {
+                    item = `<section style="display:flex;margin-top:25px;border:2px solid black;
+    margin-left:50%;border-radius:10px;background-color:blue;min-width:20%;max-width:50%;">
+
+                                            <h5 style="margin-left:10px;margin-top:15px;margin-right:10px;font-size:1em;color:white">${data.messages[i].content}</h5>
+                                            <p style="margin-top:20px;margin-right:10px;font-size:0.9em;color:white">${hour}:${minute}</p>
+                                        
+                                        </section>`;
+                }
                 content += item;
             }
             console.log(data);

@@ -15,7 +15,7 @@ namespace SocialNetwork.Entities.Entities
         public int ChatId { get; set; }
         public virtual Chat? Chat { get; set; }
         public bool HasSeen { get; set; }
-        //public string? SenderId { get; set; }
-        //public string? ReceiverId { get; set; }
+        public string? SenderId { get; set; }
+        public string? ReceiverId { get; set; }
     }
 }

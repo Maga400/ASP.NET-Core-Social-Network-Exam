@@ -172,6 +172,7 @@ namespace SocialNetwork.WebUI.Controllers
         {
             try
             {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
                 var chats = await _chatService.GetAllAsync();
                 var chat = chats.FirstOrDefault(c => c.SenderId == model.SenderId && c.ReceiverId == model.ReceiverId || c.SenderId == model.ReceiverId && c.ReceiverId == model.SenderId);
                 if (chat != null)
@@ -183,6 +184,8 @@ namespace SocialNetwork.WebUI.Controllers
                         DateTime = DateTime.Now,
                         IsImage = false,
                         HasSeen = false,
+                        SenderId = user.Id,
+                        ReceiverId = user.Id != model.ReceiverId?model.ReceiverId : model.SenderId,
                     };
                     await _messageService.AddAsync(message);
                 }

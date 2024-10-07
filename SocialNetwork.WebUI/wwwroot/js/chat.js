@@ -39,6 +39,11 @@ connection.on("Disconnect", function (info) {
 
 connection.on("ReceiveMessages", function (receiverId, senderId) {
     GetMessages(receiverId, senderId);
+    var audio = document.querySelector("#mySound2");
+    setTimeout(() => {
+        audio.play();
+
+    },1500)
 })
 
 async function GetMessageCall(receiverId, senderId) {
